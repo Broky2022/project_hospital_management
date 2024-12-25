@@ -19,6 +19,7 @@ class Button extends StatelessWidget {
           backgroundColor: Config.primaryColor,
           foregroundColor: Colors.white,
         ),
+<<<<<<< HEAD
           onPressed: disable ? null : onPressed,
           child: Text(
             title,
@@ -31,3 +32,17 @@ class Button extends StatelessWidget {
     );
   }
 }
+=======
+        onPressed: disable ? null : onPressed,
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+>>>>>>> thuan

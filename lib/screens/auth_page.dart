@@ -20,7 +20,11 @@ class _AuthPageState extends State<AuthPage>{
         padding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 15,
+<<<<<<< HEAD
       ),
+=======
+        ),
+>>>>>>> thuan
         child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -47,6 +51,7 @@ class _AuthPageState extends State<AuthPage>{
               Config.spaceSmall,
               Center(
                 child: TextButton(
+<<<<<<< HEAD
                     onPressed: () {},
                     child: Text(
                       AppText.enText['forgot-password']!,
@@ -57,22 +62,46 @@ class _AuthPageState extends State<AuthPage>{
                       ),
                     ),
               ),
+=======
+                  onPressed: () {},
+                  child: Text(
+                    AppText.enText['forgot-password']!,
+                    style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+>>>>>>> thuan
               ),
               const Spacer(),
               Center(
                 child: Text(AppText.enText['social-login']!,
+<<<<<<< HEAD
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.normal,
                       color: Colors.grey,
                     ),
+=======
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey,
+                  ),
+>>>>>>> thuan
                 ),
               ),
               Config.spaceSmall,
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: const <Widget>[
+<<<<<<< HEAD
                 SocialButton(social: 'google'),
+=======
+                  SocialButton(social: 'google'),
+>>>>>>> thuan
                   SocialButton(social: 'facebook'),
                 ],
               ),
@@ -81,15 +110,24 @@ class _AuthPageState extends State<AuthPage>{
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
+<<<<<<< HEAD
                       AppText.enText['signUp_text']!,
                       style: const TextStyle(
+=======
+                    AppText.enText['signUp_text']!,
+                    style: const TextStyle(
+>>>>>>> thuan
                       fontSize: 16,
                       fontWeight: FontWeight.normal,
                       color: Colors.grey,
                     ),
                   ),
                   const Text(
+<<<<<<< HEAD
                       'Sign Up',
+=======
+                    'Sign Up',
+>>>>>>> thuan
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -104,4 +142,8 @@ class _AuthPageState extends State<AuthPage>{
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> thuan
