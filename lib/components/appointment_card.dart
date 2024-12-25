@@ -26,22 +26,25 @@ class _AppointmentCardState extends State<AppointmentCard> {
               Row(
                 children: [
                   const CircleAvatar(
-                    backgroundImage:
-                    AssetImage('assets/doctor_1.png'),
+                    backgroundImage: AssetImage('assets/doctor_1.png'),
                   ),
-                  const SizedBox(width: 10,),
+                  const SizedBox(
+                    width: 10,
+                  ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const <Widget>[
                       Text(
-                        'Bs Nguyen Van A', style: TextStyle(color: Colors.white),
+                        'Bs Nguyen Van A',
+                        style: TextStyle(color: Colors.white),
                       ),
                       const SizedBox(
                         height: 2,
                       ),
                       Text(
-                        'Dental', style: TextStyle(color: Colors.black),
+                        'Dental',
+                        style: TextStyle(color: Colors.black),
                       )
                     ],
                   ),
@@ -55,24 +58,28 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                        ),
-                        child: const Text(
-                          'Cancel', style: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () {},
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
                       ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () {},
+                    ),
                   ),
-                  const SizedBox(width: 20,),
+                  const SizedBox(
+                    width: 20,
+                  ),
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                        backgroundColor: Colors.blue,
                       ),
                       child: const Text(
-                        'Completed', style: TextStyle(color: Colors.white),
+                        'Completed',
+                        style: TextStyle(color: Colors.white),
                       ),
                       onPressed: () {},
                     ),
@@ -103,29 +110,33 @@ class ScheduleCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: const <Widget>[
           Icon(
-             Icons.calendar_today,
+            Icons.calendar_today,
             color: Colors.white,
             size: 15,
           ),
-
-          SizedBox(width: 5,),
-
+          SizedBox(
+            width: 5,
+          ),
           Text(
             'Monday, 11/28/2024',
             style: const TextStyle(color: Colors.white),
           ),
-
-          SizedBox(width: 20,),
-
+          SizedBox(
+            width: 20,
+          ),
           Icon(
             Icons.access_alarm,
             color: Colors.white,
             size: 17,
           ),
-
-          SizedBox(width: 5,),
-
-          Flexible(child: Text('2:00 PM', style: TextStyle(color: Colors.white),))
+          SizedBox(
+            width: 5,
+          ),
+          Flexible(
+              child: Text(
+            '2:00 PM',
+            style: TextStyle(color: Colors.white),
+          ))
         ],
       ),
     );
