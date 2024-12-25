@@ -4,14 +4,14 @@ import 'package:project_hospital_management/components/social_button.dart';
 import 'package:project_hospital_management/utils/text.dart';
 import '../utils/config.dart';
 
-class AuthPage extends StatefulWidget{
+class AuthPage extends StatefulWidget {
   const AuthPage({Key? key}) : super(key: key);
 
   @override
   State<AuthPage> createState() => _AuthPageState();
 }
 
-class _AuthPageState extends State<AuthPage>{
+class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     Config().init(context);
@@ -20,11 +20,7 @@ class _AuthPageState extends State<AuthPage>{
         padding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 15,
-<<<<<<< HEAD
-      ),
-=======
         ),
->>>>>>> thuan
         child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -51,18 +47,6 @@ class _AuthPageState extends State<AuthPage>{
               Config.spaceSmall,
               Center(
                 child: TextButton(
-<<<<<<< HEAD
-                    onPressed: () {},
-                    child: Text(
-                      AppText.enText['forgot-password']!,
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-              ),
-=======
                   onPressed: () {},
                   child: Text(
                     AppText.enText['forgot-password']!,
@@ -73,35 +57,23 @@ class _AuthPageState extends State<AuthPage>{
                     ),
                   ),
                 ),
->>>>>>> thuan
               ),
               const Spacer(),
               Center(
-                child: Text(AppText.enText['social-login']!,
-<<<<<<< HEAD
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.grey,
-                    ),
-=======
+                child: Text(
+                  AppText.enText['social-login']!,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.normal,
                     color: Colors.grey,
                   ),
->>>>>>> thuan
                 ),
               ),
               Config.spaceSmall,
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: const <Widget>[
-<<<<<<< HEAD
-                SocialButton(social: 'google'),
-=======
                   SocialButton(social: 'google'),
->>>>>>> thuan
                   SocialButton(social: 'facebook'),
                 ],
               ),
@@ -110,24 +82,15 @@ class _AuthPageState extends State<AuthPage>{
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-<<<<<<< HEAD
-                      AppText.enText['signUp_text']!,
-                      style: const TextStyle(
-=======
                     AppText.enText['signUp_text']!,
                     style: const TextStyle(
->>>>>>> thuan
                       fontSize: 16,
                       fontWeight: FontWeight.normal,
                       color: Colors.grey,
                     ),
                   ),
                   const Text(
-<<<<<<< HEAD
-                      'Sign Up',
-=======
                     'Sign Up',
->>>>>>> thuan
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -142,8 +105,4 @@ class _AuthPageState extends State<AuthPage>{
       ),
     );
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> thuan

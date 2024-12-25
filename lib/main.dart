@@ -20,27 +20,6 @@ class MyApp extends StatelessWidget {
       title: 'Project manager hospital',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-<<<<<<< HEAD
-          inputDecorationTheme: const InputDecorationTheme(
-            focusColor: Config.primaryColor,
-            border: Config.outlinedBorder,
-            focusedBorder: Config.focusBorder,
-            errorBorder: Config.errorBorder,
-            enabledBorder: Config.outlinedBorder,
-            floatingLabelStyle: TextStyle(color: Config.primaryColor),
-            prefixIconColor: Colors.black38,
-          ),
-          scaffoldBackgroundColor: Colors.white,
-          bottomNavigationBarTheme: BottomNavigationBarThemeData(
-            backgroundColor: Config.primaryColor,
-            selectedItemColor: Colors.white,
-            showSelectedLabels: true,
-            showUnselectedLabels: false,
-            unselectedItemColor: Colors.grey.shade700,
-            elevation: 10,
-            type: BottomNavigationBarType.fixed,
-          ),
-=======
         inputDecorationTheme: const InputDecorationTheme(
           focusColor: Config.primaryColor,
           border: Config.outlinedBorder,
@@ -60,21 +39,14 @@ class MyApp extends StatelessWidget {
           elevation: 10,
           type: BottomNavigationBarType.fixed,
         ),
->>>>>>> thuan
       ),
       initialRoute: '/',
       routes: {
         //Đây là route (đường dẫn) khởi đầu của ứng dụng
         //Route này sẽ dẫn đến trang xác thực (authentication) bao gồm phần đăng nhập và đăng ký
-        '/' : (context) => const AuthPage(),
-        'main' : (context) => const MainLayout(),
+        '/': (context) => const AuthPage(),
+        'main': (context) => const MainLayout(),
       },
-
     );
   }
-<<<<<<< HEAD
 }
-
-=======
-}
->>>>>>> thuan

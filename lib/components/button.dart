@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import '../utils/config.dart';
 
 class Button extends StatelessWidget {
-  const Button({Key? key, required this.width, required this.title, required this.onPressed, required this.disable}) : super(key: key);
+  const Button(
+      {Key? key,
+      required this.width,
+      required this.title,
+      required this.onPressed,
+      required this.disable})
+      : super(key: key);
 
   final double width;
   final String title;
   final bool disable;
   final Function() onPressed;
-
 
   @override
   Widget build(BuildContext context) {
@@ -19,20 +24,6 @@ class Button extends StatelessWidget {
           backgroundColor: Config.primaryColor,
           foregroundColor: Colors.white,
         ),
-<<<<<<< HEAD
-          onPressed: disable ? null : onPressed,
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-      ),
-    );
-  }
-}
-=======
         onPressed: disable ? null : onPressed,
         child: Text(
           title,
@@ -45,4 +36,3 @@ class Button extends StatelessWidget {
     );
   }
 }
->>>>>>> thuan

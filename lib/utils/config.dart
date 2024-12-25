@@ -1,59 +1,51 @@
 import 'package:flutter/material.dart';
 
-class Config{
+class Config {
   static MediaQueryData? mediaQueryData;
   static double? screenWidth;
   static double? screenHeight;
 
   //Khởi tạo chiều rộng và chiều cao
-  void init(BuildContext context){
+  void init(BuildContext context) {
     mediaQueryData = MediaQuery.of(context);
     screenWidth = mediaQueryData!.size.width;
     screenHeight = mediaQueryData!.size.height;
   }
 
-  static get widthSize{
+  static get widthSize {
     return screenWidth;
   }
 
-  static get heightSize{
+  static get heightSize {
     return screenHeight;
   }
 
   //Định nghĩa khoảng cách của chiều cao
-  static const spaceSmall = SizedBox(height: 25,);
-  static final spaceMedium = SizedBox(height: screenHeight! * 0.05,);
-  static final spaceBig = SizedBox(height: screenHeight! * 0.08,);
+  static const spaceSmall = SizedBox(
+    height: 25,
+  );
+  static final spaceMedium = SizedBox(
+    height: screenHeight! * 0.05,
+  );
+  static final spaceBig = SizedBox(
+    height: screenHeight! * 0.08,
+  );
 
   static const outlinedBorder = OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(8)),
   );
 
   static const focusBorder = OutlineInputBorder(
-<<<<<<< HEAD
-    borderRadius: BorderRadius.all(Radius.circular(8)),
-    borderSide: BorderSide(color: Colors.greenAccent,
-    )
-  );
-
-  static const errorBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(8)),
-    borderSide: BorderSide(
-      color: Colors.red,
-    )
-=======
       borderRadius: BorderRadius.all(Radius.circular(8)),
-      borderSide: BorderSide(color: Colors.greenAccent,
-      )
-  );
+      borderSide: BorderSide(
+        color: Colors.greenAccent,
+      ));
 
   static const errorBorder = OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(8)),
       borderSide: BorderSide(
         color: Colors.red,
-      )
->>>>>>> thuan
-  );
+      ));
 
   static const primaryColor = Colors.greenAccent;
 }

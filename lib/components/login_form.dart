@@ -2,20 +2,14 @@ import 'package:flutter/material.dart';
 import '../utils/config.dart';
 import 'button.dart';
 
-class LoginForm extends StatefulWidget{
+class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
 
   @override
   State<LoginForm> createState() => _LoginFormState();
-<<<<<<< HEAD
-  }
-
-  class _LoginFormState extends State<LoginForm>{
-=======
 }
 
-class _LoginFormState extends State<LoginForm>{
->>>>>>> thuan
+class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
@@ -47,25 +41,6 @@ class _LoginFormState extends State<LoginForm>{
             cursorColor: Config.primaryColor,
             obscureText: obsecurePass,
             decoration: InputDecoration(
-<<<<<<< HEAD
-              hintText: 'Password',
-              labelText: 'Password',
-              alignLabelWithHint: true,
-              prefixIcon: const Icon(Icons.lock_outline),
-              prefixIconColor: Config.primaryColor,
-              suffixIcon: IconButton(
-                  onPressed: () {
-                setState(() {
-                  obsecurePass = !obsecurePass;
-                });
-              },
-                  icon: obsecurePass
-                  ? const Icon(Icons.visibility_off_outlined, color: Colors.black38,
-                  )
-                  : const Icon(Icons.visibility_outlined, color: Config.primaryColor,
-                  ))),
-            ),
-=======
                 hintText: 'Password',
                 labelText: 'Password',
                 alignLabelWithHint: true,
@@ -78,31 +53,26 @@ class _LoginFormState extends State<LoginForm>{
                       });
                     },
                     icon: obsecurePass
-                        ? const Icon(Icons.visibility_off_outlined, color: Colors.black38,
-                    )
-                        : const Icon(Icons.visibility_outlined, color: Config.primaryColor,
-                    ))),
+                        ? const Icon(
+                            Icons.visibility_off_outlined,
+                            color: Colors.black38,
+                          )
+                        : const Icon(
+                            Icons.visibility_outlined,
+                            color: Config.primaryColor,
+                          ))),
           ),
->>>>>>> thuan
           Config.spaceSmall,
           Button(
             width: double.infinity,
             title: 'Sign In',
-<<<<<<< HEAD
-            onPressed: () {},
-=======
             onPressed: () {
               Navigator.of(context).pushNamed('main');
             },
->>>>>>> thuan
             disable: false,
           )
         ],
       ),
     );
   }
-<<<<<<< HEAD
-  }
-=======
 }
->>>>>>> thuan

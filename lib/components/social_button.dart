@@ -6,22 +6,14 @@ class SocialButton extends StatelessWidget {
 
   final String social;
 
-
   @override
   Widget build(BuildContext context) {
     Config().init(context);
     return OutlinedButton(
-<<<<<<< HEAD
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 15),
-        side: const BorderSide(width: 1, color: Colors.black),
-      ),
-=======
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 15),
           side: const BorderSide(width: 1, color: Colors.black),
         ),
->>>>>>> thuan
         onPressed: () {},
         child: SizedBox(
           width: Config.widthSize * 0.4,
@@ -41,11 +33,6 @@ class SocialButton extends StatelessWidget {
               ),
             ],
           ),
-        )
-    );
+        ));
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> thuan

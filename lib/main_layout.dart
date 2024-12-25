@@ -1,24 +1,16 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-=======
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:project_hospital_management/screens/appointment_page.dart';
 import 'package:project_hospital_management/screens/home_page.dart';
->>>>>>> thuan
 
-class MainLayout extends StatefulWidget{
+class MainLayout extends StatefulWidget {
   const MainLayout({Key? key}) : super(key: key);
 
   @override
   State<MainLayout> createState() => _MainLayoutState();
 }
 
-class _MainLayoutState extends State<MainLayout>{
-<<<<<<< HEAD
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-=======
+class _MainLayoutState extends State<MainLayout> {
   //variable declaration
   int currentPage = 0;
   final PageController _page = PageController();
@@ -44,9 +36,9 @@ class _MainLayoutState extends State<MainLayout>{
           setState(() {
             currentPage = page;
             _page.animateToPage(
-                page,
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeInOut,
+              page,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
             );
           });
         },
@@ -62,6 +54,5 @@ class _MainLayoutState extends State<MainLayout>{
         ],
       ),
     );
->>>>>>> thuan
   }
 }
