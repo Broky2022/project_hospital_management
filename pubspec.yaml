@@ -7,6 +7,7 @@ environment:
   sdk: ^3.5.4
 
 dependencies:
+  font_awesome_flutter: ^10.8.0
   flutter:
     sdk: flutter
 
