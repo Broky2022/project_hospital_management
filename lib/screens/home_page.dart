@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:project_hospital_management/components/appointment_card.dart';
 import 'package:project_hospital_management/components/doctor_card.dart';
+import 'package:project_hospital_management/providers/dio_provider.dart';
 import 'package:project_hospital_management/utils/config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,6 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Map<String, dynamic> user = {};
   //Lap danh sach trong category
   List<Map<String, dynamic>> medCat = [
     {
@@ -39,6 +44,29 @@ class _HomePageState extends State<HomePage> {
       "category": "Dental",
     },
   ];
+
+  Future<void> getData() async {
+    //lay token tu shared preferences
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token')??'';
+
+    if (token.isNotEmpty && token != ''){
+      //get user data
+      final response = await DioProvider().getUser(token);
+      if(response != null){
+        setState(() {
+          user = json.decode(response);
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Config().init(context);
@@ -56,15 +84,15 @@ class _HomePageState extends State<HomePage> {
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const <Widget>[
+                  children: <Widget>[
                     Text(
-                      'Nguyen Hoang Ky',
-                      style: TextStyle(
+                      user['name'],
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       child: CircleAvatar(
                         radius: 30,
                         backgroundImage: AssetImage('assets/profile1.png'),
@@ -137,7 +165,9 @@ class _HomePageState extends State<HomePage> {
                 Config.spaceSmall,
                 Column(
                   children: List.generate(10, (index) {
-                    return DoctorCard();
+                    return const DoctorCard(
+                      route: 'doc_details',
+                    );
                   }),
                 ),
               ],
