@@ -17,4 +17,11 @@ thống nhất acc test:
 1. User: meanfuc@gmail.com - password: fuc@123123
 2. Doctor: meanthuan@gmail.com - password: thuan@123123
 
-Ps: data lên mysql thành công
+Ps: data lên mysql thành công!
+
+# Cách chạy dữ liệu: 
+- chạy xampp Apache và MySql
+- bật 2 terminal lên, đi vào thư mục doc_app (cd doc_app)
+- chạy lệnh: php artisan serve và npm run dev
+- thử nghiệm tại địa chỉ sau khi chạy lệnh php serve (của t là http://127.0.0.1:8000)
+- data sẽ ở trong mysql
