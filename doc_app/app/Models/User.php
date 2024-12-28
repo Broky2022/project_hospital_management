@@ -53,22 +53,9 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-
     public function doctor(){
-        return $this->hasOne(Doctor::class, 'doc_id');
-    }
+            return $this->hasOne(Doctor::class, 'doc_id');
+        }
 
     public function user_details(){
         return $this->hasOne(UserDetails::class, 'user_id');

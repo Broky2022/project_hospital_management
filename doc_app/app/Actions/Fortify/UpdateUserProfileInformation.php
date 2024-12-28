@@ -3,11 +3,12 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Models\Doctor;
+use App\Models\UserDetails;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
-use App\Models\Doctor;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {

@@ -14,22 +14,18 @@ class JetstreamServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        //kiểm tra email người dùng, mật khẩu và chỉ cho phép type "bác sĩ" đăng nhập
+    //kiểm tra email người dùng, mật khẩu và chỉ cho phép type "bác sĩ" đăng nhập
         Fortify::authenticateUsing(function(Request $request){
             $user = User::where('email', $request->email)->first();
             if($user && Hash::check($request->password, $user->password) && $user->type == 'doctor'){
@@ -39,14 +35,14 @@ class JetstreamServiceProvider extends ServiceProvider
         $this->configurePermissions();
 
         Jetstream::deleteUsersUsing(DeleteUser::class);
+
+        //Vite::prefetch(concurrency: 3);
     }
 
     /**
      * Configure the permissions that are available within the application.
-     *
-     * @return void
      */
-    protected function configurePermissions()
+    protected function configurePermissions(): void
     {
         Jetstream::defaultApiTokenPermissions(['read']);
 

@@ -11,7 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-
         Schema::create('doctors', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('doc_id')->unique();
