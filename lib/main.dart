@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:project_hospital_management/main_layout.dart';
+import 'package:project_hospital_management/models/auth_model.dart';
 import 'package:project_hospital_management/screens/booking_page.dart';
 import 'package:project_hospital_management/screens/doctor_details.dart';
 import 'package:project_hospital_management/screens/success.booked.dart';
 import 'utils/config.dart';
 import 'screens/auth_page.dart';
+import 'package:provider/provider.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +21,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //định dạng màu nền
-    return MaterialApp(
+    return ChangeNotifierProvider<AuthModel> (
+      create: (context) => AuthModel(),
+
+    child: MaterialApp(
       navigatorKey: navigatorKey,
       title: 'Project manager hospital',
       debugShowCheckedModeBanner: false,
@@ -53,6 +59,7 @@ class MyApp extends StatelessWidget {
         'booking_page': (context) => BookingPage(),
         'success_booking': (context) => const AppointmentBooked(),
       },
+    ),
     );
   }
 }
