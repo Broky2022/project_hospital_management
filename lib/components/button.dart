@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../utils/config.dart';
 
 class Button extends StatelessWidget {
@@ -12,7 +13,7 @@ class Button extends StatelessWidget {
 
   final double width;
   final String title;
-  final bool disable;
+  final bool disable; //this is used to disable button
   final Function() onPressed;
 
   @override

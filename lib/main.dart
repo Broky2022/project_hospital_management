@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:project_hospital_management/main_layout.dart';
 import 'package:project_hospital_management/models/auth_model.dart';
+import 'package:project_hospital_management/screens/auth_page.dart';
 import 'package:project_hospital_management/screens/booking_page.dart';
-import 'package:project_hospital_management/screens/doctor_details.dart';
-import 'package:project_hospital_management/screens/success.booked.dart';
+import 'package:project_hospital_management/screens/success_booked.dart';
+import 'package:project_hospital_management/utils/config.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'utils/config.dart';
-import 'screens/auth_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,18 +14,20 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  //this is for push navigator
   static final navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
-    //định dạng màu nền
+    //define ThemeData here
     return ChangeNotifierProvider<AuthModel>(
       create: (context) => AuthModel(),
       child: MaterialApp(
         navigatorKey: navigatorKey,
-        title: 'Project manager hospital',
+        title: 'Flutter Doctor App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          //pre-define input decoration
           inputDecorationTheme: const InputDecorationTheme(
             focusColor: Config.primaryColor,
             border: Config.outlinedBorder,
@@ -49,11 +50,8 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: '/',
         routes: {
-          //Đây là route (đường dẫn) khởi đầu của ứng dụng
-          //Route này sẽ dẫn đến trang xác thực (authentication) bao gồm phần đăng nhập và đăng ký
           '/': (context) => const AuthPage(),
           'main': (context) => const MainLayout(),
-          'doc_details': (context) => const DoctorDetails(),
           'booking_page': (context) => BookingPage(),
           'success_booking': (context) => const AppointmentBooked(),
         },
@@ -61,4 +59,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

@@ -1,12 +1,14 @@
-import 'dart:async';
+import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:project_hospital_management/components/button.dart';
 import 'package:project_hospital_management/main.dart';
 import 'package:project_hospital_management/models/auth_model.dart';
 import 'package:project_hospital_management/providers/dio_provider.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../utils/config.dart';
-import 'button.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -20,7 +22,6 @@ class _LoginFormState extends State<LoginForm> {
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
   bool obsecurePass = true;
-
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -70,17 +71,45 @@ class _LoginFormState extends State<LoginForm> {
           ),
           Config.spaceSmall,
           Consumer<AuthModel>(
-            builder: (context, auth, child){
+            builder: (context, auth, child) {
               return Button(
                 width: double.infinity,
                 title: 'Sign In',
-                onPressed: ()async {
-                  final token = await DioProvider().getToken(_emailController.text, _passController.text);
+                onPressed: () async {
+                  //login
+                  final token = await DioProvider()
+                      .getToken(_emailController.text, _passController.text);
 
+                  if (token) {
+                    //auth.loginSuccess(); //update trạng thái login
 
-                  if(token){
-                    auth.loginSuccess();
-                    MyApp.navigatorKey.currentState!.pushNamed('main');
+                    //lấy dữ liệu người dùng
+                    final SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    final tokenValue = prefs.getString('token') ?? '';
+                    if (tokenValue.isNotEmpty && tokenValue != '') {
+                      //lấy user data
+                      final response = await DioProvider().getUser(tokenValue);
+                      if (response != null) {
+                        setState(() {
+                          //json decode
+                          Map<String, dynamic> appointment = {};
+                          final user = json.decode(response);
+
+                          //check if any appointment today
+                          for (var doctorData in user['doctor']) {
+                            //if there is appointment return for today
+
+                            if (doctorData['appointments'] != null) {
+                              appointment = doctorData;
+                            }
+                          }
+
+                          auth.loginSuccess(user, appointment);
+                          MyApp.navigatorKey.currentState!.pushNamed('main');
+                        });
+                      }
+                    }
                   }
                 },
                 disable: false,

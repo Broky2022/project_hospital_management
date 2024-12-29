@@ -1,7 +1,9 @@
+import 'package:project_hospital_management/screens/appointment_page.dart';
+import 'package:project_hospital_management/screens/fav_page.dart';
+import 'package:project_hospital_management/screens/home_page.dart';
+import 'package:project_hospital_management/screens/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:project_hospital_management/screens/appointment_page.dart';
-import 'package:project_hospital_management/screens/home_page.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({Key? key}) : super(key: key);
@@ -21,13 +23,14 @@ class _MainLayoutState extends State<MainLayout> {
         controller: _page,
         onPageChanged: ((value) {
           setState(() {
-            //update page when tab pressed
             currentPage = value;
           });
         }),
-        children: const <Widget>[
-          HomePage(),
-          AppointmentPage(),
+        children: <Widget>[
+          const HomePage(),
+          FavPage(),
+          const AppointmentPage(),
+          ProfilePage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -48,8 +51,16 @@ class _MainLayoutState extends State<MainLayout> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.solidHeart),
+            label: 'Favorite',
+          ),
+          BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.solidCalendarCheck),
             label: 'Appointments',
+          ),
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.solidUser),
+            label: 'Profile',
           ),
         ],
       ),

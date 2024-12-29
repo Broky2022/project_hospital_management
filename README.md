@@ -14,7 +14,7 @@
 
 Thống nhất acc test:
 1. User: meanfuc@gmail.com - password: fuc@123123
-2. Doctor: meanthuan@gmail.com - password: thuan@123123
+2. Doctor: meanthuan@gmail.com - password: thuan@123
 
 >*Ps: data lên mysql thành công!*
 
