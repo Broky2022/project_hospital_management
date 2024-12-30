@@ -1,18 +1,14 @@
 class Appointment {
-  final int? id;
-  final int userId;
-  final int docId;
-  final String date;
-  final String day;
-  final String time;
-  final String status;
+  int id;
+  int doctorId;
+  int patientId;
+  String time;
+  String status; // "scheduled", "completed", "cancelled"
 
   Appointment({
-    this.id,
-    required this.userId,
-    required this.docId,
-    required this.date,
-    required this.day,
+    required this.id,
+    required this.doctorId,
+    required this.patientId,
     required this.time,
     required this.status,
   });
@@ -20,22 +16,18 @@ class Appointment {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'user_id': userId,
-      'doc_id': docId,
-      'date': date,
-      'day': day,
+      'doctorId': doctorId,
+      'patientId': patientId,
       'time': time,
       'status': status,
     };
   }
 
-  factory Appointment.fromMap(Map<String, dynamic> map) {
+  static Appointment fromMap(Map<String, dynamic> map) {
     return Appointment(
       id: map['id'],
-      userId: map['user_id'],
-      docId: map['doc_id'],
-      date: map['date'],
-      day: map['day'],
+      doctorId: map['doctorId'],
+      patientId: map['patientId'],
       time: map['time'],
       status: map['status'],
     );
