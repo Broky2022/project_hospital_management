@@ -11,4 +11,9 @@
 - Git fetch: Tải về tất cả các thay đổi từ remote mà không tự động hợp nhất (fetch) vào nhánh hiện tại
 - Git branch -r: kiểm tra các nhánh cục bộ hiện tại
 
-đây là ở nhánh Kỳ
+đây là ở nhánh Phúc1
+
+Signup data: {email: 1@gmail.com, password: fuc@123, name: d, age: 2, weight: 1, address: v, description: t}
+Signup error: Bad state: databaseFactory not initialized
+databaseFactory is only initialized when using sqflite. When using `sqflite_common_ffi`
+You must call `databaseFactory = databaseFactoryFfi;` before using global openDatabase API
