@@ -10,7 +10,8 @@ class SignUpForm extends StatefulWidget {
   _SignUpFormState createState() => _SignUpFormState();
 }
 
-class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateMixin {
+class _SignUpFormState extends State<SignUpForm>
+    with SingleTickerProviderStateMixin {
   // Controllers để quản lý input từ các TextFormField
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -55,10 +56,10 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
   // Validate tên người dùng
   String? _validateName(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your name';
+      return 'Vui lòng nhập tên của bạn';
     }
     if (value.length < 2) {
-      return 'Name must be at least 2 characters long';
+      return 'Tên phải dài ít nhất 2 ký tự';
     }
     return null;
   }
@@ -66,11 +67,11 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
   // Validate email với regex
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email';
+      return 'Vui lòng nhập email của bạn';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email address';
+      return 'Vui lòng nhập địa chỉ email hợp lệ';
     }
     return null;
   }
@@ -78,16 +79,16 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
   // Validate mật khẩu (yêu cầu có chữ hoa và số)
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your password';
+      return 'Làm ơn hãy nhập mật khẩu';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
+      return 'Mật khẩu phải dài ít nhất 6 ký tự';
     }
     if (!value.contains(RegExp(r'[A-Z]'))) {
-      return 'Password must contain at least one uppercase letter';
+      return 'Mật khẩu phải chứa ít nhất một chữ cái viết hoa';
     }
     if (!value.contains(RegExp(r'[0-9]'))) {
-      return 'Password must contain at least one number';
+      return 'Mật khẩu phải chứa ít nhất một số';
     }
     return null;
   }
@@ -95,7 +96,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
   // Validate bio data cho bác sĩ
   String? _validateBioData(String? value) {
     if (_isDoctor && (value == null || value.isEmpty)) {
-      return 'Please enter your bio data';
+      return 'Làm ơn hãy nhập giới thiệu';
     }
     return null;
   }
@@ -141,7 +142,8 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Account created successfully! Please login.'),
+              content:
+                  Text('Tài khoản đã được tạo thành công! Vui lòng đăng nhập.'),
               backgroundColor: Colors.green,
             ),
           );
@@ -152,7 +154,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('An error occurred. Please try again.'),
+              content: Text('Đã xảy ra lỗi. Vui lòng thử lại.'),
               backgroundColor: Colors.red,
             ),
           );
@@ -231,7 +233,9 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() => _obscurePassword = !_obscurePassword);
@@ -245,7 +249,6 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                   textInputAction: TextInputAction.next,
                   validator: _validatePassword,
                 ),
-
 
                 // Switch chọn loại tài khoản (user/doctor)
                 const SizedBox(height: 16),
@@ -290,17 +293,17 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Text(
-                    'Create Account',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                          'Create Account',
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
 
                 // Link quay lại trang đăng nhập

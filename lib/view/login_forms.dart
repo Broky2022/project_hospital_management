@@ -11,7 +11,8 @@ class LoginForm extends StatefulWidget {
   _LoginFormState createState() => _LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMixin {
+class _LoginFormState extends State<LoginForm>
+    with SingleTickerProviderStateMixin {
   // Controllers để quản lý input từ các TextFormField
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -49,11 +50,11 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
   // Validate email với regex
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email';
+      return 'Vui lòng nhập email của bạn';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email address';
+      return 'Vui lòng nhập địa chỉ email hợp lệ';
     }
     return null;
   }
@@ -61,10 +62,10 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
   // Validate mật khẩu
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your password';
+      return 'Vui lòng nhập mật khẩu của bạn';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
+      return 'Mật khẩu phải dài ít nhất 6 ký tự';
     }
     return null;
   }
@@ -102,7 +103,7 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
             // Đăng nhập thất bại
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Invalid email or password'),
+                content: Text('Đã xảy ra lỗi. Vui lòng thử lại'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -112,7 +113,7 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
         // Xử lý lỗi và hiển thị thông báo
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('An error occurred. Please try again.'),
+            content: Text('Đã xảy ra lỗi. Vui lòng thử lại.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -170,19 +171,19 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
 
                 // Form field nhập mật khẩu
                 const SizedBox(height: 16),
-            TextFormField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                prefixIcon: const Icon(Icons.lock),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(Icons.lock),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  obscureText: true,
+                  textInputAction: TextInputAction.done,
+                  validator: _validatePassword,
                 ),
-              ),
-              obscureText: true,
-              textInputAction: TextInputAction.done,
-              validator: _validatePassword,
-            ),
 
                 // Nút đăng nhập với loading indicator
                 const SizedBox(height: 24),
@@ -196,17 +197,17 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Text(
-                    'Login',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                          'Login',
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
 
                 // Link đến trang đăng ký
@@ -215,10 +216,11 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
                   onPressed: _isLoading
                       ? null
                       : () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignUpForm()),
-                  ),
-                  child: const Text('Don\'t have an account? Sign Up'),
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SignUpForm()),
+                          ),
+                  child: const Text('Bạn chưa có tài khoản? Đăng ký'),
                 ),
               ],
             ),
