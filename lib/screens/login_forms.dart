@@ -62,7 +62,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Invalid credentials')),
+                        SnackBar(
+                            content: Text('Thông tin đăng nhập không hợp lệ')),
                       );
                     }
                   }
@@ -74,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   context,
                   MaterialPageRoute(builder: (context) => SignupScreen()),
                 ),
-                child: Text('Create Account'),
+                child: Text('Tạo tài khoản'),
               ),
             ],
           ),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../database/databasehelper.dart';
 import '../providers/auth_provider.dart';
+import 'login_forms.dart';
 
 class DoctorHome extends StatefulWidget {
   @override
@@ -22,6 +23,10 @@ class _DoctorHomeState extends State<DoctorHome> {
             icon: Icon(Icons.logout),
             onPressed: () {
               Provider.of<AuthProvider>(context, listen: false).logout();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+                (route) => false,
+              );
             },
           ),
         ],
