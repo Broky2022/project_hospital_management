@@ -1,43 +1,47 @@
-class Doctor {
-  final int? id;
-  final String docId;
-  final String category;
-  final int patients;
-  final int experience;
-  final String bioData;
-  final String status;
+import 'user.dart';
+
+class Doctor extends User {
+  final int doctorId;
+  final String specialty;
+  final int yearsOfExperience;
+  final String description;
+  final bool status;
 
   Doctor({
-    this.id,
-    required this.docId,
-    required this.category,
-    required this.patients,
-    required this.experience,
-    required this.bioData,
+    required int id,
+    required String email,
+    required String password,
+    required this.doctorId,
+    required this.specialty,
+    required this.yearsOfExperience,
+    required this.description,
     required this.status,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'doc_id': docId,
-      'category': category,
-      'patients': patients,
-      'experience': experience,
-      'bio_data': bioData,
-      'status': status,
-    };
-  }
+  }) : super(id: id, email: email, password: password, role: 'doctor');
 
   factory Doctor.fromMap(Map<String, dynamic> map) {
     return Doctor(
       id: map['id'],
-      docId: map['doc_id'],
-      category: map['category'],
-      patients: map['patients'],
-      experience: map['experience'],
-      bioData: map['bio_data'],
-      status: map['status'],
+      email: map['email'],
+      password: map['password'],
+      doctorId: map['doctor_id'],
+      specialty: map['specialty'],
+      yearsOfExperience: map['years_of_experience'],
+      description: map['description'],
+      status: map['status'] == 1,
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'email': email,
+      'password': password,
+      'role': role,
+      'doctor_id': doctorId,
+      'specialty': specialty,
+      'years_of_experience': yearsOfExperience,
+      'description': description,
+      'status': status ? 1 : 0,
+    };
   }
 }

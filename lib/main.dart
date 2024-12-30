@@ -1,24 +1,51 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import '../view/login_forms.dart';
-import '../view/signup_form.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+import 'screens/login_form.dart';
+import 'screens/doctor_home.dart';
+import 'screens/patient_home.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
 
 void main() {
-  runApp(const MyApp());
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter demo v1',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (_) => AuthProvider(),
+      child: MaterialApp(
+        title: 'Medical App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+        ),
+        home: AuthenticationWrapper(),
       ),
-      home: LoginForm(),
     );
   }
 }
+
+class AuthenticationWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthProvider>(
+      builder: (_, authProvider, __) {
+        if (authProvider.userRole == null) {
+          return LoginScreen();
+        }
+        return authProvider.userRole == 'doctor' ? DoctorHome() : PatientHome();
+      },
+    );
+  }
+}
+
+
+

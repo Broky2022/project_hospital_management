@@ -1,32 +1,40 @@
 import 'package:flutter/material.dart';
-import '../database/databasehelper.dart';
+import 'package:project_hospital_management/database/databaseHelper.dart';
+import 'package:provider/provider.dart';
+import '../main.dart';
 import '../models/user.dart';
-import '../models/doctor.dart';
-import '../view/signup_form.dart';
+import '../providers/auth_provider.dart';
+import 'doctor_home.dart';
+import 'patient_home.dart';
+import 'signup_form.dart';
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginFormState createState() => _LoginFormState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMixin {
-  // Controllers để quản lý input từ các TextFormField
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+  // Key để quản lý và validate form
+  final _formKey = GlobalKey<FormState>();
+
+  // Controllers để quản lý input
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); // Key để validate form
 
-  bool _isLoading = false; // Trạng thái loading khi đăng nhập
+  // Các biến trạng thái
+  bool _isLoading = false;
+  bool _obscurePassword = true;
 
-  // Controllers cho animation fade-in
+  // Controllers cho animation
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    // Khởi tạo animation fade-in khi màn hình được load
+    // Khởi tạo animation fade-in
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -39,21 +47,21 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
 
   @override
   void dispose() {
-    // Giải phóng bộ nhớ khi widget bị hủy
+    // Giải phóng bộ nhớ
     _emailController.dispose();
     _passwordController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
-  // Validate email với regex
+  // Validate email
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email';
+      return 'Vui lòng nhập email';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email address';
+      return 'Email không hợp lệ';
     }
     return null;
   }
@@ -61,63 +69,55 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
   // Validate mật khẩu
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your password';
+      return 'Vui lòng nhập mật khẩu';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
+      return 'Mật khẩu phải có ít nhất 6 ký tự';
     }
     return null;
   }
 
   // Xử lý đăng nhập
-  Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true); // Hiển thị loading
+  Future<void> _handleLogin() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() => _isLoading = true);
 
       try {
-        // Lấy dữ liệu từ form
-        final email = _emailController.text.trim();
-        final password = _passwordController.text;
-
-        // Kiểm tra thông tin đăng nhập trong database
-        final db = await DatabaseHelper.instance.database;
-        final users = await db.query(
-          'users',
-          where: 'email = ? AND password = ?',
-          whereArgs: [email, password],
+        // Gọi login từ AuthProvider
+        final success = await context.read<AuthProvider>().login(
+          _emailController.text.trim(),
+          _passwordController.text,
         );
 
         if (mounted) {
-          if (users.isNotEmpty) {
-            // Đăng nhập thành công
-            final user = User.fromMap(users.first);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Welcome ${user.name}!'),
-                backgroundColor: Colors.green,
+          if (success) {
+            // Chuyển hướng dựa vào role
+            final role = context.read<AuthProvider>().userRole;
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => role == 'doctor' ? const DoctorHome() : const PatientHome(),
               ),
             );
-            // TODO: Chuyển đến trang chủ hoặc dashboard
           } else {
-            // Đăng nhập thất bại
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Invalid email or password'),
+                content: Text('Thông tin đăng nhập không hợp lệ'),
                 backgroundColor: Colors.red,
               ),
             );
           }
         }
       } catch (e) {
-        // Xử lý lỗi và hiển thị thông báo
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('An error occurred. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Đã có lỗi xảy ra. Vui lòng thử lại.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       } finally {
-        // Tắt loading
         if (mounted) {
           setState(() => _isLoading = false);
         }
@@ -131,10 +131,9 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Đăng nhập'),
         centerTitle: true,
       ),
-      // Animation fade-in cho toàn bộ form
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: SingleChildScrollView(
@@ -144,21 +143,21 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Icon đăng nhập
+                // Logo hoặc icon
                 const SizedBox(height: 32),
                 Icon(
-                  Icons.account_circle,
-                  size: 80,
+                  Icons.local_hospital_rounded,
+                  size: 100,
                   color: theme.primaryColor,
                 ),
                 const SizedBox(height: 32),
 
-                // Form field nhập email
+                // Field nhập email
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email),
+                    prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -168,26 +167,32 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
                   validator: _validateEmail,
                 ),
 
-                // Form field nhập mật khẩu
+                // Field nhập mật khẩu
                 const SizedBox(height: 16),
-            TextFormField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                prefixIcon: const Icon(Icons.lock),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Mật khẩu',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  obscureText: _obscurePassword,
+                  textInputAction: TextInputAction.done,
+                  validator: _validatePassword,
                 ),
-              ),
-              obscureText: true,
-              textInputAction: TextInputAction.done,
-              validator: _validatePassword,
-            ),
 
-                // Nút đăng nhập với loading indicator
+                // Nút đăng nhập
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _login,
+                  onPressed: _isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -204,21 +209,21 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
                     ),
                   )
                       : const Text(
-                    'Login',
+                    'Đăng nhập',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
 
-                // Link đến trang đăng ký
+                // Link đăng ký
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: _isLoading
                       ? null
                       : () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SignUpForm()),
+                    MaterialPageRoute(builder: (context) => const SignupScreen()),
                   ),
-                  child: const Text('Don\'t have an account? Sign Up'),
+                  child: const Text('Chưa có tài khoản? Đăng ký ngay'),
                 ),
               ],
             ),
