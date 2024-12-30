@@ -20,3 +20,6 @@
 - php artisan migrate: tạo (hoặc đồng bộ) database trên mysql
 - npm run dev
 - php artisan serve: chạy backend PHP laravel
+
+
+đây là ở nhánh Kỳ
