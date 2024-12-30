@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:project_hospital_management/models/user.dart';
-import 'package:project_hospital_management/view/homepage.dart';
-import '../view/login_forms.dart';
-import '../view/signup_form.dart';
-import 'view/doctorhomepage.dart';
-import 'view/patienthomepage.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+import 'screens/login_forms.dart';
+import 'screens/doctor_home.dart';
+import 'screens/patient_home.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,28 +12,33 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Hospital Management App',
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => LoginPage(),
-        '/register': (context) => RegisterPage(),
-        '/home': (context) => HomePage(), // Trang Home chung
-      },
+    return ChangeNotifierProvider(
+      create: (_) => AuthProvider(),
+      child: MaterialApp(
+        title: 'Medical App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+        ),
+        home: AuthenticationWrapper(),
+      ),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
+class AuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final User user = ModalRoute.of(context)!.settings.arguments as User;
-
-    // Dựa vào vai trò để điều hướng tới trang phù hợp
-    if (user.role == 'doctor') {
-      return DoctorHomePage(user: user);
-    } else {
-      return PatientHomePage(user: user);
-    }
+    return Consumer<AuthProvider>(
+      builder: (_, authProvider, __) {
+        if (authProvider.userRole == null) {
+          return LoginScreen();
+        }
+        return authProvider.userRole == 'doctor' ? DoctorHome() : PatientHome();
+      },
+    );
   }
 }

@@ -1,264 +1,145 @@
-import 'package:project_hospital_management/models/appointments.dart';
-import 'package:project_hospital_management/models/disease.dart';
-import 'package:project_hospital_management/models/doctor.dart';
-import 'package:project_hospital_management/models/patient.dart';
-import 'package:project_hospital_management/models/user.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
-class DataHelper {
-  static final DataHelper instance = DataHelper._init();
+class DatabaseHelper {
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
   static Database? _database;
 
-  DataHelper._init();
+  DatabaseHelper._privateConstructor();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('app.db');
+    _database = await _initDatabase();
     return _database!;
   }
 
-  Future<Database> _initDB(String path) async {
-    final dbPath = await getDatabasesPath();
-    final pathToDB = dbPath + path;
-    return await openDatabase(pathToDB, version: 1, onCreate: _onCreate);
+  Future<Database> _initDatabase() async {
+    String path = join(await getDatabasesPath(), 'medical_app.db');
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: _onCreate,
+    );
   }
 
-  Future _onCreate(Database db, int version) async {
+  Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE users (
-        id INTEGER PRIMARY KEY,
-        email TEXT,
-        password TEXT,
-        role TEXT
-      );
-      CREATE TABLE doctors (
-        doctorId INTEGER PRIMARY KEY,
-        userId INTEGER,
-        specialty TEXT,
-        yearsOfExperience INTEGER,
+      CREATE TABLE users(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE doctors(
+        doctor_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER,
+        specialty TEXT NOT NULL,
+        years_of_experience INTEGER NOT NULL,
         description TEXT,
-        status TEXT,
-        FOREIGN KEY(userId) REFERENCES users(id)
-      );
-      CREATE TABLE patients (
-        patientId INTEGER PRIMARY KEY,
-        userId INTEGER,
-        name TEXT,
-        age INTEGER,
-        weight REAL,
-        address TEXT,
-        diseaseId INTEGER,
+        status INTEGER NOT NULL,
+        FOREIGN KEY (id) REFERENCES users (id)
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE patients(
+        patient_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER,
+        name TEXT NOT NULL,
+        age INTEGER NOT NULL,
+        weight REAL NOT NULL,
+        address TEXT NOT NULL,
+        disease_id INTEGER,
         description TEXT,
-        FOREIGN KEY(userId) REFERENCES users(id),
-        FOREIGN KEY(diseaseId) REFERENCES diseases(id)
-      );
-      CREATE TABLE appointments (
-        id INTEGER PRIMARY KEY,
-        doctorId INTEGER,
-        patientId INTEGER,
-        time TEXT,
-        status TEXT,
-        FOREIGN KEY(doctorId) REFERENCES doctors(doctorId),
-        FOREIGN KEY(patientId) REFERENCES patients(patientId)
-      );
-      CREATE TABLE diseases (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
+        FOREIGN KEY (id) REFERENCES users (id),
+        FOREIGN KEY (disease_id) REFERENCES diseases (id)
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE appointments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doctor_id INTEGER,
+        patient_id INTEGER,
+        date_time TEXT NOT NULL,
+        status TEXT NOT NULL,
+        FOREIGN KEY (doctor_id) REFERENCES doctors (doctor_id),
+        FOREIGN KEY (patient_id) REFERENCES patients (patient_id)
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE diseases(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
         description TEXT
-      );
+      )
     ''');
   }
 
-  // Các phương thức như add, get, update cho các model sẽ được thêm vào đây
-  // Add a User
-  Future<int> addUser(User user) async {
-    final db = await database;
-    return await db.insert('users', user.toMap());
+  // CRUD operations for each model will go here
+  // Example for User:
+  Future<int> insertUser(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    return await db.insert('users', row);
   }
 
-// Get a User by id
-  Future<User?> getUser(int id) async {
-    final db = await database;
-    final result = await db.query('users', where: 'id = ?', whereArgs: [id]);
-    if (result.isNotEmpty) {
-      return User.fromMap(result.first);
-    }
-    return null;
-  }
-
-  // Kiểm tra người dùng theo email và mật khẩu
-  Future<User?> getUserByEmailAndPassword(String email, String password) async {
-    final db = await database;
-    final result = await db.query(
-      'users',
-      where: 'email = ? AND password = ?',
-      whereArgs: [email, password],
-    );
-
-    if (result.isNotEmpty) {
-      return User.fromMap(result.first); // Trả về người dùng nếu tìm thấy
-    }
-
-    return null; // Trả về null nếu không tìm thấy
-  }
-
-  // Kiểm tra người dùng theo email
-  Future<User?> getUserByEmail(String email) async {
-    final db = await database;
-    final result = await db.query(
+  Future<Map<String, dynamic>?> getUserByEmail(String email) async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> results = await db.query(
       'users',
       where: 'email = ?',
       whereArgs: [email],
+      limit: 1,
     );
-
-    if (result.isNotEmpty) {
-      return User.fromMap(result.first); // Trả về đối tượng User nếu tìm thấy
-    }
-
-    return null; // Trả về null nếu không tìm thấy người dùng
+    return results.isNotEmpty ? results.first : null;
   }
 
-// Update a User
-  Future<int> updateUser(User user) async {
-    final db = await database;
-    return await db
-        .update('users', user.toMap(), where: 'id = ?', whereArgs: [user.id]);
+  Future<int> insert(String table, Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    return await db.insert(table, row);
   }
 
-// Delete a User
-  Future<int> deleteUser(int id) async {
-    final db = await database;
-    return await db.delete('users', where: 'id = ?', whereArgs: [id]);
+  Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
+    Database db = await instance.database;
+    return await db.query(table);
   }
 
-// Add a Doctor
-  Future<int> addDoctor(Doctor doctor) async {
-    final db = await database;
-    return await db.insert('doctors', doctor.toMap());
+  Future<int> update(String table, Map<String, dynamic> row, String whereClause,
+      List<dynamic> whereArgs) async {
+    Database db = await instance.database;
+    return await db.update(table, row,
+        where: whereClause, whereArgs: whereArgs);
   }
 
-// Get a Doctor by id
-  Future<Doctor?> getDoctor(int id) async {
-    final db = await database;
-    final result =
-        await db.query('doctors', where: 'doctorId = ?', whereArgs: [id]);
-    if (result.isNotEmpty) {
-      return Doctor.fromMap(result.first);
-    }
-    return null;
+  Future<int> delete(
+      String table, String whereClause, List<dynamic> whereArgs) async {
+    Database db = await instance.database;
+    return await db.delete(table, where: whereClause, whereArgs: whereArgs);
   }
 
-// Update a Doctor
-  Future<int> updateDoctor(Doctor doctor) async {
-    final db = await database;
-    return await db.update('doctors', doctor.toMap(),
-        where: 'doctorId = ?', whereArgs: [doctor.doctorId]);
+  Future<Map<String, dynamic>?> getPatientProfile(int userId) async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> results = await db.query(
+      'patients',
+      where: 'id = ?',
+      whereArgs: [userId],
+      limit: 1,
+    );
+    return results.isNotEmpty ? results.first : null;
   }
 
-// Delete a Doctor
-  Future<int> deleteDoctor(int id) async {
-    final db = await database;
-    return await db.delete('doctors', where: 'doctorId = ?', whereArgs: [id]);
-  }
-
-// Add a Patient
-  Future<int> addPatient(Patient patient) async {
-    final db = await database;
-    return await db.insert('patients', patient.toMap());
-  }
-
-// Get a Patient by id
-  Future<Patient?> getPatient(int id) async {
-    final db = await database;
-    final result =
-        await db.query('patients', where: 'patientId = ?', whereArgs: [id]);
-    if (result.isNotEmpty) {
-      return Patient.fromMap(result.first);
-    }
-    return null;
-  }
-
-// Update a Patient
-  Future<int> updatePatient(Patient patient) async {
-    final db = await database;
-    return await db.update('patients', patient.toMap(),
-        where: 'patientId = ?', whereArgs: [patient.patientId]);
-  }
-
-// Delete a Patient
-  Future<int> deletePatient(int id) async {
-    final db = await database;
-    return await db.delete('patients', where: 'patientId = ?', whereArgs: [id]);
-  }
-
-// Add an Appointment
-  Future<int> addAppointment(Appointment appointment) async {
-    final db = await database;
-    return await db.insert('appointments', appointment.toMap());
-  }
-
-// Get an Appointment by id
-  Future<Appointment?> getAppointment(int id) async {
-    final db = await database;
-    final result =
-        await db.query('appointments', where: 'id = ?', whereArgs: [id]);
-    if (result.isNotEmpty) {
-      return Appointment.fromMap(result.first);
-    }
-    return null;
-  }
-
-// Get all Appointments by doctorId or patientId
-  Future<List<Appointment>> getAppointmentsByDoctorOrPatient(int doctorId,
-      {int? patientId}) async {
-    final db = await database;
-    final where =
-        patientId != null ? 'doctorId = ? AND patientId = ?' : 'doctorId = ?';
-    final whereArgs = patientId != null ? [doctorId, patientId] : [doctorId];
-    final result =
-        await db.query('appointments', where: where, whereArgs: whereArgs);
-    return result.map((e) => Appointment.fromMap(e)).toList();
-  }
-
-// Update an Appointment
-  Future<int> updateAppointment(Appointment appointment) async {
-    final db = await database;
-    return await db.update('appointments', appointment.toMap(),
-        where: 'id = ?', whereArgs: [appointment.id]);
-  }
-
-// Delete an Appointment
-  Future<int> deleteAppointment(int id) async {
-    final db = await database;
-    return await db.delete('appointments', where: 'id = ?', whereArgs: [id]);
-  }
-
-// Add a Disease
-  Future<int> addDisease(Disease disease) async {
-    final db = await database;
-    return await db.insert('diseases', disease.toMap());
-  }
-
-// Get a Disease by id
-  Future<Disease?> getDisease(int id) async {
-    final db = await database;
-    final result = await db.query('diseases', where: 'id = ?', whereArgs: [id]);
-    if (result.isNotEmpty) {
-      return Disease.fromMap(result.first);
-    }
-    return null;
-  }
-
-// Update a Disease
-  Future<int> updateDisease(Disease disease) async {
-    final db = await database;
-    return await db.update('diseases', disease.toMap(),
-        where: 'id = ?', whereArgs: [disease.id]);
-  }
-
-// Delete a Disease
-  Future<int> deleteDisease(int id) async {
-    final db = await database;
-    return await db.delete('diseases', where: 'id = ?', whereArgs: [id]);
+  Future<List<Map<String, dynamic>>> getPatientAppointments(
+      int patientId) async {
+    Database db = await instance.database;
+    return await db.rawQuery('''
+    SELECT a.*, d.name as doctor_name
+    FROM appointments a
+    JOIN doctors d ON a.doctor_id = d.doctor_id
+    WHERE a.patient_id = ?
+  ''', [patientId]);
   }
 }

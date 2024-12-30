@@ -1,13 +1,13 @@
-import 'package:project_hospital_management/models/user.dart';
+import 'user.dart';
 
 class Patient extends User {
-  int patientId;
-  String name;
-  int age;
-  double weight;
-  String address;
-  int diseaseId;
-  String description;
+  final int patientId;
+  final String name;
+  final int age;
+  final double weight;
+  final String address;
+  final int diseaseId;
+  final String description;
 
   Patient({
     required int id,
@@ -22,31 +22,34 @@ class Patient extends User {
     required this.description,
   }) : super(id: id, email: email, password: password, role: 'patient');
 
-  Map<String, dynamic> toMap() {
-    return {
-      ...super.toMap(),
-      'patientId': patientId,
-      'name': name,
-      'age': age,
-      'weight': weight,
-      'address': address,
-      'diseaseId': diseaseId,
-      'description': description,
-    };
-  }
-
-  static Patient fromMap(Map<String, dynamic> map) {
+  factory Patient.fromMap(Map<String, dynamic> map) {
     return Patient(
       id: map['id'],
       email: map['email'],
       password: map['password'],
-      patientId: map['patientId'],
+      patientId: map['patient_id'],
       name: map['name'],
       age: map['age'],
       weight: map['weight'],
       address: map['address'],
-      diseaseId: map['diseaseId'],
+      diseaseId: map['disease_id'],
       description: map['description'],
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'email': email,
+      'password': password,
+      'role': role,
+      'patient_id': patientId,
+      'name': name,
+      'age': age,
+      'weight': weight,
+      'address': address,
+      'disease_id': diseaseId,
+      'description': description,
+    };
   }
 }

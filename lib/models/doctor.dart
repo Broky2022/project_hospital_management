@@ -1,11 +1,11 @@
-import 'package:project_hospital_management/models/user.dart';
+import 'user.dart';
 
 class Doctor extends User {
-  int doctorId;
-  String specialty;
-  int yearsOfExperience;
-  String description;
-  String status; // "active" hoặc "inactive"
+  final int doctorId;
+  final String specialty;
+  final int yearsOfExperience;
+  final String description;
+  final bool status;
 
   Doctor({
     required int id,
@@ -18,27 +18,30 @@ class Doctor extends User {
     required this.status,
   }) : super(id: id, email: email, password: password, role: 'doctor');
 
-  Map<String, dynamic> toMap() {
-    return {
-      ...super.toMap(),
-      'doctorId': doctorId,
-      'specialty': specialty,
-      'yearsOfExperience': yearsOfExperience,
-      'description': description,
-      'status': status,
-    };
-  }
-
-  static Doctor fromMap(Map<String, dynamic> map) {
+  factory Doctor.fromMap(Map<String, dynamic> map) {
     return Doctor(
       id: map['id'],
       email: map['email'],
       password: map['password'],
-      doctorId: map['doctorId'],
+      doctorId: map['doctor_id'],
       specialty: map['specialty'],
-      yearsOfExperience: map['yearsOfExperience'],
+      yearsOfExperience: map['years_of_experience'],
       description: map['description'],
-      status: map['status'],
+      status: map['status'] == 1,
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'email': email,
+      'password': password,
+      'role': role,
+      'doctor_id': doctorId,
+      'specialty': specialty,
+      'years_of_experience': yearsOfExperience,
+      'description': description,
+      'status': status ? 1 : 0,
+    };
   }
 }
