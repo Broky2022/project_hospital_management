@@ -11,22 +11,26 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateMixin {
+  // Controllers để quản lý input từ các TextFormField
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _bioDataController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(); // Key để validate form
 
-  bool _isLoading = false;
-  bool _isDoctor = false;
-  bool _obscurePassword = true;
+  // Các biến trạng thái
+  bool _isLoading = false; // Trạng thái đang xử lý
+  bool _isDoctor = false; // Kiểm tra có phải bác sĩ không
+  bool _obscurePassword = true; // Ẩn/hiện mật khẩu
 
+  // Controllers cho animation fade-in
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    // Khởi tạo animation fade-in khi màn hình được load
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -39,6 +43,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
 
   @override
   void dispose() {
+    // Giải phóng bộ nhớ khi widget bị hủy
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -47,6 +52,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
     super.dispose();
   }
 
+  // Validate tên người dùng
   String? _validateName(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your name';
@@ -57,6 +63,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
     return null;
   }
 
+  // Validate email với regex
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
@@ -68,6 +75,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
     return null;
   }
 
+  // Validate mật khẩu (yêu cầu có chữ hoa và số)
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your password';
@@ -84,6 +92,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
     return null;
   }
 
+  // Validate bio data cho bác sĩ
   String? _validateBioData(String? value) {
     if (_isDoctor && (value == null || value.isEmpty)) {
       return 'Please enter your bio data';
@@ -91,11 +100,13 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
     return null;
   }
 
+  // Xử lý đăng ký
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      setState(() => _isLoading = true); // Hiển thị loading
 
       try {
+        // Lấy dữ liệu từ form
         final name = _nameController.text.trim();
         final email = _emailController.text.trim();
         final password = _passwordController.text;
@@ -104,6 +115,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
 
         final db = DatabaseHelper.instance;
 
+        // Nếu là bác sĩ thì tạo thêm record trong bảng doctors
         if (_isDoctor) {
           final doctor = Doctor(
             docId: email,
@@ -116,6 +128,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
           await db.createDoctor(doctor);
         }
 
+        // Tạo user mới
         final user = User(
           name: name,
           type: type,
@@ -124,6 +137,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
         );
         await db.createUser(user);
 
+        // Hiển thị thông báo thành công và quay lại màn hình login
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -134,6 +148,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
           Navigator.pop(context);
         }
       } catch (e) {
+        // Xử lý lỗi và hiển thị thông báo
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -143,6 +158,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
           );
         }
       } finally {
+        // Tắt loading
         if (mounted) {
           setState(() => _isLoading = false);
         }
@@ -159,6 +175,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
         title: const Text('Sign Up'),
         centerTitle: true,
       ),
+      // Animation fade-in cho toàn bộ form
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: SingleChildScrollView(
@@ -168,6 +185,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Icon đăng ký
                 const SizedBox(height: 24),
                 Icon(
                   Icons.person_add_rounded,
@@ -175,6 +193,8 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                   color: theme.primaryColor,
                 ),
                 const SizedBox(height: 24),
+
+                // Form field nhập họ tên
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
@@ -187,6 +207,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                   textInputAction: TextInputAction.next,
                   validator: _validateName,
                 ),
+                // Form field nhập email
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
@@ -201,6 +222,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                   textInputAction: TextInputAction.next,
                   validator: _validateEmail,
                 ),
+                // Form field nhập mật khẩu với toggle ẩn/hiện
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
@@ -223,6 +245,9 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                   textInputAction: TextInputAction.next,
                   validator: _validatePassword,
                 ),
+
+
+                // Switch chọn loại tài khoản (user/doctor)
                 const SizedBox(height: 16),
                 SwitchListTile(
                   title: const Text('Register as Doctor'),
@@ -235,6 +260,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                     color: _isDoctor ? theme.primaryColor : null,
                   ),
                 ),
+                // Form field nhập bio data (chỉ hiện khi đăng ký là bác sĩ)
                 if (_isDoctor) ...[
                   const SizedBox(height: 16),
                   TextFormField(
@@ -252,6 +278,7 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                     validator: _validateBioData,
                   ),
                 ],
+                // Nút đăng ký với loading indicator
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _signUp,
@@ -275,6 +302,8 @@ class _SignUpFormState extends State<SignUpForm> with SingleTickerProviderStateM
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
+
+                // Link quay lại trang đăng nhập
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: _isLoading ? null : () => Navigator.pop(context),

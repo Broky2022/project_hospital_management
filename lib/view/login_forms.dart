@@ -12,16 +12,21 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMixin {
+  // Controllers để quản lý input từ các TextFormField
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>(); // Key để validate form
+
+  bool _isLoading = false; // Trạng thái loading khi đăng nhập
+
+  // Controllers cho animation fade-in
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    // Khởi tạo animation fade-in khi màn hình được load
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -34,12 +39,14 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
 
   @override
   void dispose() {
+    // Giải phóng bộ nhớ khi widget bị hủy
     _emailController.dispose();
     _passwordController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
+  // Validate email với regex
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
@@ -51,6 +58,7 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
     return null;
   }
 
+  // Validate mật khẩu
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your password';
@@ -61,14 +69,17 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
     return null;
   }
 
+  // Xử lý đăng nhập
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      setState(() => _isLoading = true); // Hiển thị loading
 
       try {
+        // Lấy dữ liệu từ form
         final email = _emailController.text.trim();
         final password = _passwordController.text;
 
+        // Kiểm tra thông tin đăng nhập trong database
         final db = await DatabaseHelper.instance.database;
         final users = await db.query(
           'users',
@@ -78,6 +89,7 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
 
         if (mounted) {
           if (users.isNotEmpty) {
+            // Đăng nhập thành công
             final user = User.fromMap(users.first);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -85,8 +97,9 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
                 backgroundColor: Colors.green,
               ),
             );
-            // Navigate to home page or dashboard
+            // TODO: Chuyển đến trang chủ hoặc dashboard
           } else {
+            // Đăng nhập thất bại
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Invalid email or password'),
@@ -96,6 +109,7 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
           }
         }
       } catch (e) {
+        // Xử lý lỗi và hiển thị thông báo
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('An error occurred. Please try again.'),
@@ -103,6 +117,7 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
           ),
         );
       } finally {
+        // Tắt loading
         if (mounted) {
           setState(() => _isLoading = false);
         }
@@ -119,6 +134,7 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
         title: const Text('Login'),
         centerTitle: true,
       ),
+      // Animation fade-in cho toàn bộ form
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: SingleChildScrollView(
@@ -128,6 +144,7 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Icon đăng nhập
                 const SizedBox(height: 32),
                 Icon(
                   Icons.account_circle,
@@ -135,6 +152,8 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
                   color: theme.primaryColor,
                 ),
                 const SizedBox(height: 32),
+
+                // Form field nhập email
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -148,20 +167,24 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
                   textInputAction: TextInputAction.next,
                   validator: _validateEmail,
                 ),
+
+                // Form field nhập mật khẩu
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  obscureText: true,
-                  textInputAction: TextInputAction.done,
-                  validator: _validatePassword,
+            TextFormField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                prefixIcon: const Icon(Icons.lock),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
+              ),
+              obscureText: true,
+              textInputAction: TextInputAction.done,
+              validator: _validatePassword,
+            ),
+
+                // Nút đăng nhập với loading indicator
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
@@ -185,16 +208,16 @@ class _LoginFormState extends State<LoginForm> with SingleTickerProviderStateMix
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
+
+                // Link đến trang đăng ký
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: _isLoading
                       ? null
-                      : () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignUpForm()),
-                    );
-                  },
+                      : () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignUpForm()),
+                  ),
                   child: const Text('Don\'t have an account? Sign Up'),
                 ),
               ],
