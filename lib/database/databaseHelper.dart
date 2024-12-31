@@ -244,9 +244,11 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getAppointments(int appointmentId) async {
     final db = await database;
 
+    // Câu truy vấn SQL sửa lại
     String query = '''
     SELECT 
         doctors.doctor_id,
+        doctors.name,
         doctors.specialty,
         doctors.years_of_experience,
         doctors.description AS doctor_description,

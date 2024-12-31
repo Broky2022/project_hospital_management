@@ -49,7 +49,7 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                    'Doctor: ${appointment['doctor_id']} - ${appointment['doctor_description']}'),
+                    'Doctor: ${appointment['doctor_id']} - ${appointment['name']}'),
                 Text('Specialty: ${appointment['specialty']}'),
                 Text(
                     'Years of Experience: ${appointment['yearsOfExperience']}'),
