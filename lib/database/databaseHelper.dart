@@ -15,6 +15,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'medical_app.db');
+    await deleteDatabase(path);
     return await openDatabase(
       path,
       version: 1,
@@ -28,7 +29,8 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT NOT NULL,
         password TEXT NOT NULL,
-        role TEXT NOT NULL
+        role TEXT NOT NULL,
+        name TEXT NOT NULL
       )
     ''');
 
@@ -36,6 +38,7 @@ class DatabaseHelper {
       CREATE TABLE doctors(
         doctor_id INTEGER PRIMARY KEY AUTOINCREMENT,
         id INTEGER,
+        name TEXT NOT NULL,
         specialty TEXT NOT NULL,
         years_of_experience INTEGER NOT NULL,
         description TEXT,
@@ -60,16 +63,16 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-      CREATE TABLE appointments(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        doctor_id INTEGER,
-        patient_id INTEGER,
-        date_time TEXT NOT NULL,
-        status TEXT NOT NULL,
-        FOREIGN KEY (doctor_id) REFERENCES doctors (doctor_id),
-        FOREIGN KEY (patient_id) REFERENCES patients (patient_id)
-      )
-    ''');
+    CREATE TABLE appointments(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      doctor_id INTEGER,
+      patient_id INTEGER,
+      date_time TEXT NOT NULL,
+      status TEXT NOT NULL,
+      FOREIGN KEY (doctor_id) REFERENCES doctors (doctor_id),
+      FOREIGN KEY (patient_id) REFERENCES patients (patient_id)
+    )
+  ''');
 
     await db.execute('''
       CREATE TABLE diseases(
@@ -81,15 +84,37 @@ class DatabaseHelper {
   }
 
   // CRUD operations for each model will go here
+  Future<int> insert(String table, Map<String, dynamic> data) async {
+    final db = await database;
+    return await db.insert(table, data);
+  }
+  Future<int> insertAppointment(Map<String, dynamic> appointmentData) async {
+    final db = await database;
+    return await db.insert('appointments', appointmentData);
+  }
+  Future<int> insertDisease(Map<String, dynamic> diseaseData) async {
+    final db = await database;
+    return await db.insert('diseases', diseaseData);
+  }
   // Example for User:
-  Future<int> insertUser(Map<String, dynamic> row) async {
-    Database db = await instance.database;
-    return await db.insert('users', row);
+  Future<int> insertUser(Map<String, dynamic> userData) async {
+    final db = await database;
+    return await db.insert('users', userData);
+  }
+
+  Future<int> insertDoctor(Map<String, dynamic> doctorData) async {
+    final db = await database;
+    return await db.insert('doctors', doctorData);
+  }
+
+  Future<int> insertPatient(Map<String, dynamic> patientData) async {
+    final db = await database;
+    return await db.insert('patients', patientData);
   }
 
   Future<Map<String, dynamic>?> getUserByEmail(String email) async {
-    Database db = await instance.database;
-    List<Map<String, dynamic>> results = await db.query(
+    final db = await database;
+    final results = await db.query(
       'users',
       where: 'email = ?',
       whereArgs: [email],
@@ -98,12 +123,8 @@ class DatabaseHelper {
     return results.isNotEmpty ? results.first : null;
   }
 
-  Future<int> insert(String table, Map<String, dynamic> row) async {
-    Database db = await instance.database;
-    return await db.insert(table, row);
-  }
 
-  Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
+Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
     Database db = await instance.database;
     return await db.query(table);
   }
@@ -174,5 +195,14 @@ class DatabaseHelper {
       print('Error getting disease: $e');
       return null;
     }
+  }
+  Future<List<Map<String, dynamic>>> getDoctorAppointments(int doctorId) async {
+    final db = await database;
+    return await db.rawQuery('''
+    SELECT a.*, p.name as patient_name
+    FROM appointments a
+    JOIN patients p ON a.patient_id = p.patient_id
+    WHERE a.doctor_id = ?
+  ''', [doctorId]);
   }
 }

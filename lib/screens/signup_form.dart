@@ -108,6 +108,12 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
           'address': controllers['address']!.text.trim(),
           'description': controllers['description']!.text.trim(),
         };
+
+        if (_selectedRole == 'doctor') {
+          userData['specialty'] = controllers['specialty']!.text.trim();
+          userData['experience'] = controllers['experience']!.text.trim();
+        }
+
         print('Signup data: $userData'); // Debug log
         final success = await context.read<AuthProvider>().signup(
           userData,
@@ -285,6 +291,15 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
+                          TextFormField(
+                            controller: controllers['name'],
+                            decoration: const InputDecoration(
+                              labelText: 'Họ tên',
+                              prefixIcon: Icon(Icons.person_outline),
+                            ),
+                            validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
+                          ),
+                          const SizedBox(height: 16),
                           TextFormField(
                             controller: controllers['specialty'],
                             decoration: const InputDecoration(
