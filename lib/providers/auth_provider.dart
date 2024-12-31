@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../database/databaseHelper.dart';
 
 class AuthProvider with ChangeNotifier {
-  int? _userId;  // Khai báo biến _userId kiểu nullable int
+  int? _userId; // Khai báo biến _userId kiểu nullable int
   String? _userRole;
 
   // Getters để truy cập từ bên ngoài
   int? get userId => _userId;
   String? get userRole => _userRole;
+
+  get currentUser => null;
 
   Future<bool> login(String email, String password) async {
     final db = DatabaseHelper.instance;
@@ -25,7 +27,8 @@ class AuthProvider with ChangeNotifier {
   Future<bool> signup(Map<String, String> userData, String role) async {
     try {
       // Kiểm tra email tồn tại
-      final existingUser = await DatabaseHelper.instance.getUserByEmail(userData['email']!);
+      final existingUser =
+          await DatabaseHelper.instance.getUserByEmail(userData['email']!);
       if (existingUser != null) {
         throw Exception('Email đã được sử dụng');
       }
@@ -59,18 +62,14 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
   }
+
   Future<void> logout() async {
     _userId = null;
     _userRole = null;
     notifyListeners();
   }
 
-
   Future<void> _clearLocalData() async {
     // Clear các dữ liệu local
   }
-
-
 }
-
-

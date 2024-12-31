@@ -159,4 +159,17 @@ class DatabaseHelper {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getDoctorAppointments(int doctorId) async {
+    final db = await database;
+
+    return await db.rawQuery('''
+    SELECT 
+      a.id, a.date_time, a.status,
+      p.name AS patient_name, p.age AS patient_age, p.address AS patient_address
+    FROM appointments a
+    INNER JOIN patients p ON a.patient_id = p.id
+    WHERE a.doctor_id = ?
+    ORDER BY a.date_time ASC
+  ''', [doctorId]);
+  }
 }

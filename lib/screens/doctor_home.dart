@@ -32,7 +32,7 @@ class _DoctorHomeState extends State<DoctorHome> {
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const LoginScreen()),
-              (route) => false,
+          (route) => false,
         );
       }
     } catch (e) {
@@ -53,82 +53,81 @@ class _DoctorHomeState extends State<DoctorHome> {
   void _showPatientDetails(BuildContext context, Map<String, dynamic> patient) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Tiêu đề
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Thông tin bệnh nhân',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-            const Divider(),
-
-            // Thông tin chi tiết
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Họ tên'),
-              subtitle: Text(patient['name']),
-            ),
-            ListTile(
-              leading: const Icon(Icons.cake),
-              title: const Text('Tuổi'),
-              subtitle: Text('${patient['age']} tuổi'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.monitor_weight),
-              title: const Text('Cân nặng'),
-              subtitle: Text('${patient['weight']} kg'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.location_on),
-              title: const Text('Địa chỉ'),
-              subtitle: Text(patient['address']),
-            ),
-
-            // Nút đặt lịch khám
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => _scheduleAppointment(context, patient['patient_id']),
-                icon: const Icon(Icons.calendar_today),
-                label: const Text('Đặt lịch khám'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+      isScrollControlled: true, // Cho phép scroll
+      builder: (context) => SingleChildScrollView(
+        // Wrap bằng SingleChildScrollView
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom, // Tránh keyboard
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Patient Details',
+                  style: Theme.of(context).textTheme.headlineSmall),
+              SizedBox(height: 8),
+              Text('Name: ${patient['name']}'),
+              Text('Age: ${patient['age']}'),
+              Text('Weight: ${patient['weight']} kg'),
+              Text('Address: ${patient['address']}'),
+              // Nút đặt lịch khám
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () =>
+                      _scheduleAppointment(context, patient['patient_id']),
+                  style: ButtonStyle(
+                    padding:
+                        MaterialStateProperty.all(const EdgeInsets.all(12)),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.calendar_today),
+                      SizedBox(width: 8),
+                      Text('Đặt lịch khám'),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 16), // Thêm padding bottom
+            ],
+          ),
         ),
       ),
     );
   }
 
   // Xử lý đặt lịch khám
-  void _scheduleAppointment(BuildContext context, int patientId) {
-    // TODO: Implement đặt lịch khám
-    Navigator.pop(context); // Đóng modal
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Tính năng đang được phát triển')),
+  Future<void> _scheduleAppointment(BuildContext context, int patientId) async {
+    final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
+    final result = await showDialog<DateTime>(
+      context: context,
+      builder: (context) => _DateTimePickerDialog(),
     );
+
+    if (result != null) {
+      await DatabaseHelper.instance.insert('appointments', {
+        'doctor_id': doctorId,
+        'patient_id': patientId,
+        'date_time': result.toIso8601String(),
+        'status': 'Đã đặt',
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Đã đặt lịch hẹn thành công!')),
+      );
+    }
   }
 
   // Xử lý chuyển tab
@@ -197,7 +196,8 @@ class _DoctorHomeState extends State<DoctorHome> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                        const Icon(Icons.error_outline,
+                            size: 48, color: Colors.red),
                         const SizedBox(height: 16),
                         Text(
                           'Đã có lỗi xảy ra\nVui lòng thử lại',
@@ -214,7 +214,8 @@ class _DoctorHomeState extends State<DoctorHome> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.person_search, size: 48, color: Colors.grey),
+                        const Icon(Icons.person_search,
+                            size: 48, color: Colors.grey),
                         const SizedBox(height: 16),
                         Text(
                           'Không tìm thấy bệnh nhân',
@@ -260,27 +261,133 @@ class _DoctorHomeState extends State<DoctorHome> {
           ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: _onTabChanged,
-        destinations: const [
-          NavigationDestination(
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onTabChanged,
+        items: const [
+          BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
-            selectedIcon: Icon(Icons.people),
+            activeIcon: Icon(Icons.people),
             label: 'Bệnh nhân',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today_outlined),
-            selectedIcon: Icon(Icons.calendar_today),
+            activeIcon: Icon(Icons.calendar_today),
             label: 'Lịch khám',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
+            activeIcon: Icon(Icons.person),
             label: 'Hồ sơ',
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DateTimePickerDialog extends StatefulWidget {
+  @override
+  _DateTimePickerDialogState createState() => _DateTimePickerDialogState();
+}
+
+class _DateTimePickerDialogState extends State<_DateTimePickerDialog> {
+  DateTime? selectedDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Chọn thời gian khám'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ElevatedButton(
+            onPressed: () async {
+              final date = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(Duration(days: 365)),
+              );
+              if (date != null) {
+                final time = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.now(),
+                );
+                if (time != null) {
+                  setState(() {
+                    selectedDate = DateTime(
+                      date.year,
+                      date.month,
+                      date.day,
+                      time.hour,
+                      time.minute,
+                    );
+                  });
+                }
+              }
+            },
+            child: Text('Chọn thời gian'),
+          ),
+          if (selectedDate != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                'Thời gian đã chọn: ${selectedDate.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Hủy'),
+        ),
+        ElevatedButton(
+          onPressed: selectedDate == null
+              ? null
+              : () => Navigator.pop(context, selectedDate),
+          child: Text('Xác nhận'),
+        ),
+      ],
+    );
+  }
+}
+
+class _AppointmentsTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final doctorId = Provider.of<AuthProvider>(context).userId;
+
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: DatabaseHelper.instance.getDoctorAppointments(doctorId!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('Không có lịch hẹn nào'));
+        }
+
+        return ListView.builder(
+          padding: EdgeInsets.all(16),
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            final appointment = snapshot.data![index];
+            return Card(
+              child: ListTile(
+                leading: CircleAvatar(child: Icon(Icons.person)),
+                title: Text(appointment['patient_name'] ?? 'Unknown'),
+                subtitle: Text('Thời gian: ${appointment['date_time']}\n'
+                    'Trạng thái: ${appointment['status']}'),
+                isThreeLine: true,
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
