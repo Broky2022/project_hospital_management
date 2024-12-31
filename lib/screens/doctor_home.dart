@@ -4,6 +4,7 @@ import '../database/databaseHelper.dart';
 import '../database/showData.dart';
 import '../providers/auth_provider.dart';
 import 'appointmentDetail.dart';
+import 'doctor_profile.dart';
 import 'login_form.dart';
 
 class DoctorHome extends StatefulWidget {
@@ -138,17 +139,24 @@ class _DoctorHomeState extends State<DoctorHome> {
     // TODO: Implement chuyển tab
   }
 
-  // Nội dung của từng tab
+//chuyển tab
   Widget _getTabContent(int index) {
     switch (index) {
       case 0: // Tab Bệnh nhân
-        //có 5 bảng users, doctors, patients, appointments, diseases
         showData('patients'); //check dữ liệu từ bảng vào console
         return _patientsTab();
       case 1: // Tab Lịch khám
         return _AppointmentsTab();
       case 2: // Tab Hồ sơ
-        return _profileTab();
+        final doctorId =
+            Provider.of<AuthProvider>(context, listen: false).userId;
+        if (doctorId != null) {
+          // Trả về DoctorProfilePage với doctorId từ AuthProvider
+          return DoctorProfilePage();
+        } else {
+          // Xử lý khi không tìm thấy doctorId (có thể hiển thị thông báo lỗi)
+          return Center(child: Text('Không tìm thấy thông tin bác sĩ.'));
+        }
       default:
         return _patientsTab();
     }

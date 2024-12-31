@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'dart:typed_data'; // Chỉ import thư viện cần thiết
 import 'dart:ui';
@@ -11,27 +10,21 @@ import 'screens/doctor_home.dart';
 import 'screens/patient_home.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-
-void main() async {  // Thêm async
+void main() async {
+  // Thêm async
   // Đảm bảo Flutter binding được khởi tạo
   WidgetsFlutterBinding.ensureInitialized();
 
   // Cấu hình channel buffer
   ServicesBinding.instance.defaultBinaryMessenger.setMessageHandler(
     'flutter/lifecycle',
-        (ByteData? message) async {
+    (ByteData? message) async {
       return null;
     },
   );
-  // Khởi tạo database
-  if (Platform.isWindows || Platform.isLinux) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
 
   runApp(MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   @override
