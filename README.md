@@ -43,11 +43,8 @@ Model:
 
 
 ### đây là nhánh kỳ
-[x] danh sách ok
-
-[x] chức năng chuyển tab done
-
-[ ] đặt lịch thành công (chưa rõ vào database) và chưa hiện trong tab 
-
-[ ] Hồ sơ null
+- [x] danh sách ok
+- [x] chức năng chuyển tab done
+- [ ] đặt lịch thành công (chưa rõ vào database) và chưa hiện trong tab 
+- [ ] Hồ sơ null
 
