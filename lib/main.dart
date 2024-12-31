@@ -2,7 +2,6 @@
 import 'dart:io';
 import 'dart:typed_data'; // Chỉ import thư viện cần thiết
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -67,6 +66,3 @@ class AuthenticationWrapper extends StatelessWidget {
     );
   }
 }
-
-
-
