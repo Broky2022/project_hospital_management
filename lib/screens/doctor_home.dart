@@ -142,7 +142,8 @@ class _DoctorHomeState extends State<DoctorHome> {
   Widget _getTabContent(int index) {
     switch (index) {
       case 0: // Tab Bệnh nhân
-        showData('appointments'); //check dữ liệu từ bảng vào console
+        //có 5 bảng users, doctors, patients, appointments, diseases
+        showData('patients'); //check dữ liệu từ bảng vào console
         return _patientsTab();
       case 1: // Tab Lịch khám
         return _AppointmentsTab();
@@ -157,7 +158,7 @@ class _DoctorHomeState extends State<DoctorHome> {
   Widget _profileTab() {
     final doctor = Provider.of<AuthProvider>(context).currentUser;
     return Center(
-      child: Text('Hồ sơ của bác sĩ\nTên: ${doctor?.name}'),
+      child: Text('Welcome\nDoctor.${doctor?.name}'),
     );
   }
 
