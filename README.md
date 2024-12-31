@@ -13,9 +13,10 @@
 - git reset --hard <tên-nhánh-hoặc-commit>
 
 
-doctor: meanfuc@gmail.com / Fuc@123
-patient:    ky@gmail.com / Ky@123
-            ci@gmail.com / Ci@123
+1. doctor: meanfuc@gmail.com / Fuc@123
+2. patient:
+    - ky@gmail.com / Ky@123
+    - ci@gmail.com / Ci@123
 
 ## mô tả:
 Model:
@@ -30,6 +31,8 @@ Model:
 - bác sĩ sẽ thấy danh sách bệnh nhân, bấm vào sẽ thấy thông tin chi tiết, có thể đặt lịch hẹn, thêm trang profile nữa
 - bệnh nhân sẽ thấy mỗi profile bản thân, cuối cùng có thể thấy bác sĩ điều trị của bản thân, bấm vào đó có thể xem thông tin doctor
 
+---
+
 ### đây là ở nhánh Phúc1
 
 - Signup data: {email: 1@gmail.com, password: fuc@123, name: d, age: 2, weight: 1, address: v, description: t}
@@ -37,6 +40,11 @@ Model:
 - databaseFactory is only initialized when using sqflite. When using `sqflite_common_ffi`
 - You must call `databaseFactory = databaseFactoryFfi;` before using global openDatabase API
 
+
+
 ### đây là nhánh kỳ
-- thêm chức năng chuyển tab tại doctor home: chức năng đặt lịch ok rồi, nhưng lỗi ở vấn đề khi chuyển tab khi nó vẫn ở tab đầu tiên
-- -> có lẽ nên sửa Widget build(BuildContext context) của _DoctorHomeState
+[x] danh sách ok
+[x] chức năng chuyển tab done
+[ ] đặt lịch thành công (chưa rõ vào database) và chưa hiện trong tab 
+[ ] Hồ sơ null
+

@@ -113,7 +113,7 @@ class _DoctorHomeState extends State<DoctorHome> {
     final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
     final result = await showDialog<DateTime>(
       context: context,
-      builder: (context) => _DateTimePickerDialog(),
+      builder: (context) => _DateTimePickerDialog(), //chọn time
     );
 
     if (result != null) {
@@ -136,6 +136,28 @@ class _DoctorHomeState extends State<DoctorHome> {
     // TODO: Implement chuyển tab
   }
 
+  // Nội dung của từng tab
+  Widget _getTabContent(int index) {
+    switch (index) {
+      case 0: // Tab Bệnh nhân
+        return _patientsTab();
+      case 1: // Tab Lịch khám
+        return _AppointmentsTab();
+      case 2: // Tab Hồ sơ
+        return _profileTab();
+      default:
+        return _patientsTab();
+    }
+  }
+
+  // Tab Hồ sơ
+  Widget _profileTab() {
+    final doctor = Provider.of<AuthProvider>(context).currentUser;
+    return Center(
+      child: Text('Hồ sơ của bác sĩ\nTên: ${doctor?.name}'),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,124 +165,14 @@ class _DoctorHomeState extends State<DoctorHome> {
         title: const Text('Quản lý bệnh nhân'),
         centerTitle: true,
         actions: [
-          if (_isLoading)
-            const Center(
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              ),
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: _handleLogout,
-              tooltip: 'Đăng xuất',
-            ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Thanh tìm kiếm
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Tìm kiếm bệnh nhân...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              ),
-              onChanged: (value) => setState(() => _searchQuery = value),
-            ),
-          ),
-
-          // Danh sách bệnh nhân
-          Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: DatabaseHelper.instance.queryAllRows('patients'),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline,
-                            size: 48, color: Colors.red),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Đã có lỗi xảy ra\nVui lòng thử lại',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.person_search,
-                            size: 48, color: Colors.grey),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Không tìm thấy bệnh nhân',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                // Lọc danh sách theo search query
-                final patients = snapshot.data!.where((patient) {
-                  return patient['name']
-                      .toString()
-                      .toLowerCase()
-                      .contains(_searchQuery.toLowerCase());
-                }).toList();
-
-                return ListView.separated(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: patients.length,
-                  separatorBuilder: (context, index) => const Divider(),
-                  itemBuilder: (context, index) {
-                    final patient = patients[index];
-                    return ListTile(
-                      leading: const CircleAvatar(
-                        child: Icon(Icons.person),
-                      ),
-                      title: Text(
-                        patient['name'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        'Tuổi: ${patient['age']} • Cân nặng: ${patient['weight']} kg',
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => _showPatientDetails(context, patient),
-                    );
-                  },
-                );
-              },
-            ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _handleLogout,
+            tooltip: 'Đăng xuất',
           ),
         ],
       ),
+      body: _getTabContent(_selectedIndex), // Hiển thị nội dung của tab
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onTabChanged,
@@ -282,6 +194,40 @@ class _DoctorHomeState extends State<DoctorHome> {
           ),
         ],
       ),
+    );
+  }
+
+  // Tab Bệnh nhân
+  Widget _patientsTab() {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      // Danh sách bệnh nhân
+      future: DatabaseHelper.instance.queryAllRows('patients'),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Có lỗi xảy ra'));
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('Không có bệnh nhân'));
+        }
+
+        return ListView.builder(
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            final patient = snapshot.data![index];
+            return ListTile(
+              leading: const Icon(Icons.person),
+              title: Text(patient['name']),
+              subtitle: Text('Tuổi: ${patient['age']}'),
+              onTap: () => _showPatientDetails(context, patient),
+            );
+          },
+        );
+      },
     );
   }
 }
