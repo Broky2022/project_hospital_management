@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-Future<void> showData() async {
+Future<void> showData(String xp) async {
   try {
     // Mở kết nối đến cơ sở dữ liệu
     final db = await openDatabase(
@@ -9,7 +9,7 @@ Future<void> showData() async {
     );
 
     List<Map<String, dynamic>> tables = await db.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='doctors';", //đổi tên ở đây
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='$xp';", //đổi tên ở đây
     );
 
     if (tables.isEmpty) {
@@ -17,7 +17,7 @@ Future<void> showData() async {
       return;
     }
 
-    List<Map<String, dynamic>> data = await db.query('doctors'); //và ở đây!
+    List<Map<String, dynamic>> data = await db.query('$xp'); //và ở đây!
 
     // Kiểm tra dữ liệu và in ra console
     if (data.isEmpty) {

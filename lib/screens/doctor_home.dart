@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../database/databaseHelper.dart';
+import '../database/showData.dart';
 import '../providers/auth_provider.dart';
 import 'appointmentDetail.dart';
 import 'login_form.dart';
@@ -141,6 +142,7 @@ class _DoctorHomeState extends State<DoctorHome> {
   Widget _getTabContent(int index) {
     switch (index) {
       case 0: // Tab Bệnh nhân
+        showData('appointments'); //check dữ liệu từ bảng vào console
         return _patientsTab();
       case 1: // Tab Lịch khám
         return _AppointmentsTab();
