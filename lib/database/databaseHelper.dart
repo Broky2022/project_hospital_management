@@ -159,4 +159,20 @@ class DatabaseHelper {
     }
   }
 
+  // Thêm phương thức getDisease
+  Future<Map<String, dynamic>?> getDisease(int diseaseId) async {
+    final db = await database;
+    try {
+      final List<Map<String, dynamic>> result = await db.query(
+        'diseases',
+        where: 'id = ?',
+        whereArgs: [diseaseId],
+        limit: 1,
+      );
+      return result.isNotEmpty ? result.first : null;
+    } catch (e) {
+      print('Error getting disease: $e');
+      return null;
+    }
+  }
 }

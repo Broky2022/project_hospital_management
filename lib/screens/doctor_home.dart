@@ -53,83 +53,79 @@ class _DoctorHomeState extends State<DoctorHome> {
   void _showPatientDetails(BuildContext context, Map<String, dynamic> patient) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
+        isScrollControlled: true, // Cho phép scroll
+        builder: (context) => SingleChildScrollView(
+      // Wrap bằng SingleChildScrollView
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom, // Tránh keyboard
+          left: 16,
+          right: 16,
+          top: 16,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Tiêu đề
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Thông tin bệnh nhân',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-            const Divider(),
-
-            // Thông tin chi tiết
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Họ tên'),
-              subtitle: Text(patient['name']),
-            ),
-            ListTile(
-              leading: const Icon(Icons.cake),
-              title: const Text('Tuổi'),
-              subtitle: Text('${patient['age']} tuổi'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.monitor_weight),
-              title: const Text('Cân nặng'),
-              subtitle: Text('${patient['weight']} kg'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.location_on),
-              title: const Text('Địa chỉ'),
-              subtitle: Text(patient['address']),
-            ),
-
+            Text('Patient Details',
+                style: Theme.of(context).textTheme.headlineSmall),
+            SizedBox(height: 8),
+            Text('Name: ${patient['name']}'),
+            Text('Age: ${patient['age']}'),
+            Text('Weight: ${patient['weight']} kg'),
+            Text('Address: ${patient['address']}'),
             // Nút đặt lịch khám
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => _scheduleAppointment(context, patient['patient_id']),
-                icon: const Icon(Icons.calendar_today),
-                label: const Text('Đặt lịch khám'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              child: ElevatedButton(
+                onPressed: () =>
+                    _scheduleAppointment(context, patient['patient_id']),
+                style: ButtonStyle(
+                  padding:
+                  MaterialStateProperty.all(const EdgeInsets.all(12)),
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
+                ),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.calendar_today),
+                      SizedBox(width: 8),
+                      Text('Đặt lịch khám'),
+                    ],
                 ),
               ),
             ),
+          SizedBox(height: 16), // Thêm padding bottom
           ],
+        ),
         ),
       ),
     );
   }
 
   // Xử lý đặt lịch khám
-  void _scheduleAppointment(BuildContext context, int patientId) {
-    // TODO: Implement đặt lịch khám
-    Navigator.pop(context); // Đóng modal
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Tính năng đang được phát triển')),
+  Future<void> _scheduleAppointment(BuildContext context, int patientId) async {
+    final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
+    final result = await showDialog<DateTime>(
+      context: context,
+      builder: (context) => _DateTimePickerDialog(),
     );
-  }
+    if (result != null) {
+      await DatabaseHelper.instance.insert('appointments', {
+        'doctor_id': doctorId,
+        'patient_id': patientId,
+        'date_time': result.toIso8601String(),
+        'status': 'Đã đặt',
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Đã đặt lịch hẹn thành công!')),
+      );
+    }
 
   // Xử lý chuyển tab
   void _onTabChanged(int index) {
