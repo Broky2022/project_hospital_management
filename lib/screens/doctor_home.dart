@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../database/databaseHelper.dart';
 import '../providers/auth_provider.dart';
 import 'login_form.dart';
+import 'showData.dart';
 
 class DoctorHome extends StatefulWidget {
   const DoctorHome({Key? key}) : super(key: key);
@@ -142,6 +143,7 @@ class _DoctorHomeState extends State<DoctorHome> {
       case 0: // Tab Bệnh nhân
         return _patientsTab();
       case 1: // Tab Lịch khám
+        showData();
         return _AppointmentsTab();
       case 2: // Tab Hồ sơ
         return _profileTab();
@@ -154,7 +156,7 @@ class _DoctorHomeState extends State<DoctorHome> {
   Widget _profileTab() {
     final doctor = Provider.of<AuthProvider>(context).currentUser;
     return Center(
-      child: Text('Hồ sơ của bác sĩ\nTên: ${doctor?.name}'),
+      child: Text('Hồ sơ của bác sĩ\nTên: ${doctor?.id}'),
     );
   }
 
