@@ -20,7 +20,7 @@ class Patient extends User {
     required this.address,
     required this.diseaseId,
     required this.description,
-  }) : super(id: id, email: email, password: password, role: 'patient');
+  }) : super(id: id, email: email, password: password, role: 'patient', name: name);
 
   factory Patient.fromMap(Map<String, dynamic> map) {
     return Patient(
