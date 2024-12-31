@@ -1,6 +1,9 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import '../models/appointments.dart';
+import '../models/doctor.dart';
+
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
   static Database? _database;
@@ -15,7 +18,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'medical_app.db');
-    await deleteDatabase(path);
+    //await deleteDatabase(path);
     return await openDatabase(
       path,
       version: 1,
@@ -88,14 +91,17 @@ class DatabaseHelper {
     final db = await database;
     return await db.insert(table, data);
   }
+
   Future<int> insertAppointment(Map<String, dynamic> appointmentData) async {
     final db = await database;
     return await db.insert('appointments', appointmentData);
   }
+
   Future<int> insertDisease(Map<String, dynamic> diseaseData) async {
     final db = await database;
     return await db.insert('diseases', diseaseData);
   }
+
   // Example for User:
   Future<int> insertUser(Map<String, dynamic> userData) async {
     final db = await database;
@@ -123,8 +129,7 @@ class DatabaseHelper {
     return results.isNotEmpty ? results.first : null;
   }
 
-
-Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
+  Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
     Database db = await instance.database;
     return await db.query(table);
   }
@@ -164,6 +169,18 @@ Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
   ''', [patientId]);
   }
 
+  Future<Appointment?> getAppointmentById(int id) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> result =
+        await db.query('appointments', where: 'id = ?', whereArgs: [id]);
+
+    if (result.isNotEmpty) {
+      return Appointment.fromMap(result.first);
+    }
+    return null;
+  }
+
   Future<Map<String, dynamic>?> getDoctorDetails(int doctorId) async {
     final db = await database;
     try {
@@ -196,6 +213,7 @@ Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
       return null;
     }
   }
+
   Future<List<Map<String, dynamic>>> getDoctorAppointments(int doctorId) async {
     final db = await database;
     return await db.rawQuery('''
@@ -204,5 +222,54 @@ Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
     JOIN patients p ON a.patient_id = p.patient_id
     WHERE a.doctor_id = ?
   ''', [doctorId]);
+  }
+
+  Future<Doctor?> getDoctorById(int doctorId) async {
+    final db = await DatabaseHelper.instance.database;
+
+    final result = await db.query(
+      'doctors',
+      where: 'doctor_id = ?',
+      whereArgs: [doctorId],
+    );
+
+    if (result.isNotEmpty) {
+      // Chuyển đổi dữ liệu từ QueryRow sang Doctor bằng phương thức fromMap
+      return Doctor.fromMap(result.first);
+    }
+    return null;
+  }
+
+  // Hàm lấy chi tiết cuộc hẹn từ bảng Appointment
+  Future<List<Map<String, dynamic>>> getAppointments(int appointmentId) async {
+    final db = await database;
+
+    String query = '''
+    SELECT 
+        doctors.doctor_id,
+        doctors.specialty,
+        doctors.years_of_experience,
+        doctors.description AS doctor_description,
+        doctors.status AS doctor_status,
+        patients.patient_id,
+        patients.name AS patient_name,
+        patients.age AS patient_age,
+        patients.weight AS patient_weight,
+        patients.address AS patient_address,
+        patients.disease_id AS patient_disease_id,
+        patients.description AS patient_description
+    FROM 
+        appointments
+    JOIN 
+        doctors ON appointments.doctor_id = doctors.doctor_id
+    JOIN 
+        patients ON appointments.patient_id = patients.patient_id
+    WHERE 
+        appointments.id = ?;
+  ''';
+
+    // Thực thi câu truy vấn
+    final result = await db.rawQuery(query, [appointmentId]);
+    return result;
   }
 }

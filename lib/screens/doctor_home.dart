@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../database/databaseHelper.dart';
 import '../providers/auth_provider.dart';
+import 'appointmentDetail.dart';
 import 'login_form.dart';
-
 
 class DoctorHome extends StatefulWidget {
   const DoctorHome({Key? key}) : super(key: key);
@@ -33,7 +33,7 @@ class _DoctorHomeState extends State<DoctorHome> {
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const LoginScreen()),
-              (route) => false,
+          (route) => false,
         );
       }
     } catch (e) {
@@ -84,7 +84,7 @@ class _DoctorHomeState extends State<DoctorHome> {
                       _scheduleAppointment(context, patient['patient_id']),
                   style: ButtonStyle(
                     padding:
-                    MaterialStateProperty.all(const EdgeInsets.all(12)),
+                        MaterialStateProperty.all(const EdgeInsets.all(12)),
                     shape: MaterialStateProperty.all(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -327,9 +327,20 @@ class _AppointmentsTab extends StatelessWidget {
               child: ListTile(
                 leading: CircleAvatar(child: Icon(Icons.person)),
                 title: Text(appointment['patient_name'] ?? 'Unknown'),
-                subtitle: Text('Thời gian: ${appointment['date_time']}\n'
-                    'Trạng thái: ${appointment['status']}'),
+                subtitle: Text(
+                    'Thời gian: ${appointment['date_time']}\nTrạng thái: ${appointment['status']}'),
                 isThreeLine: true,
+                onTap: () {
+                  // Chuyển hướng đến trang AppointmentDetail
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppointmentDetailPage(
+                        appointmentId: appointment['id'], // Truyền ID cuộc hẹn
+                      ),
+                    ),
+                  );
+                },
               ),
             );
           },

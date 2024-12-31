@@ -3,7 +3,7 @@ import '../database/databaseHelper.dart';
 import '../models/user.dart';
 
 class AuthProvider with ChangeNotifier {
-  int? _userId;  // Khai báo biến _userId kiểu nullable int
+  int? _userId; // Khai báo biến _userId kiểu nullable int
   String? _userRole;
 
   // Getters để truy cập từ bên ngoài
@@ -35,7 +35,8 @@ class AuthProvider with ChangeNotifier {
     if (user['password'] == password) {
       _userRole = user['role'];
       _userId = user['id'];
-      setCurrentUser(User.fromMap(user)); // Cập nhật thông tin người dùng hiện tại
+      setCurrentUser(
+          User.fromMap(user)); // Cập nhật thông tin người dùng hiện tại
       notifyListeners();
       return true;
     } else {
@@ -46,7 +47,8 @@ class AuthProvider with ChangeNotifier {
   Future<bool> signup(Map<String, String> userData, String role) async {
     try {
       // Kiểm tra email tồn tại
-      final existingUser = await DatabaseHelper.instance.getUserByEmail(userData['email']!);
+      final existingUser =
+          await DatabaseHelper.instance.getUserByEmail(userData['email']!);
       if (existingUser != null) {
         throw Exception('Email đã được sử dụng');
       }
@@ -66,7 +68,8 @@ class AuthProvider with ChangeNotifier {
           'id': userId,
           'name': userData['name'],
           'specialty': userData['specialty'],
-          'years_of_experience': int.tryParse(userData['experience'] ?? '0') ?? 0, // Giá trị mặc định là 0
+          'years_of_experience': int.tryParse(userData['experience'] ?? '0') ??
+              0, // Giá trị mặc định là 0
           'description': userData['description'],
           'status': 1, // Giả sử status mặc định là 1 (active)
         };
@@ -78,9 +81,12 @@ class AuthProvider with ChangeNotifier {
         final patientMap = {
           'id': userId,
           'name': userData['name'],
-          'age': int.tryParse(userData['age'] ?? '0') ?? 0, // Giá trị mặc định là 0
-          'weight': double.tryParse(userData['weight'] ?? '0.0') ?? 0.0, // Giá trị mặc định là 0.0
-          'address': userData['address'] ?? '', // Giá trị mặc định là chuỗi rỗng
+          'age': int.tryParse(userData['age'] ?? '0') ??
+              0, // Giá trị mặc định là 0
+          'weight': double.tryParse(userData['weight'] ?? '0.0') ??
+              0.0, // Giá trị mặc định là 0.0
+          'address':
+              userData['address'] ?? '', // Giá trị mặc định là chuỗi rỗng
           'description': userData['description'],
         };
 

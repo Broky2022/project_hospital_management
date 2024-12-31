@@ -2,6 +2,7 @@ import 'user.dart';
 
 class Doctor extends User {
   final int doctorId;
+  @override
   final String name;
   final String specialty;
   final int yearsOfExperience;
@@ -18,19 +19,24 @@ class Doctor extends User {
     required this.yearsOfExperience,
     required this.description,
     required this.status,
-  }) : super(id: id, email: email, password: password, role: 'doctor', name: name);
+  }) : super(
+            id: id,
+            email: email,
+            password: password,
+            role: 'doctor',
+            name: name);
 
   factory Doctor.fromMap(Map<String, dynamic> map) {
     return Doctor(
-      id: map['id'],
-      email: map['email'],
-      password: map['password'],
-      name: map['name'],
-      doctorId: map['doctor_id'],
-      specialty: map['specialty'],
-      yearsOfExperience: map['years_of_experience'],
-      description: map['description'],
-      status: map['status'] == 1,
+      id: map['id'] as int,
+      email: map['email'] as String,
+      password: map['password'] as String,
+      name: map['name'] as String,
+      doctorId: map['doctor_id'] as int,
+      specialty: map['specialty'] as String,
+      yearsOfExperience: map['years_of_experience'] as int,
+      description: map['description'] as String,
+      status: (map['status'] as int) == 1,
     );
   }
 

@@ -2,6 +2,7 @@ import 'user.dart';
 
 class Patient extends User {
   final int patientId;
+  @override
   final String name;
   final int age;
   final double weight;
@@ -20,7 +21,12 @@ class Patient extends User {
     required this.address,
     required this.diseaseId,
     required this.description,
-  }) : super(id: id, email: email, password: password, role: 'patient', name: name);
+  }) : super(
+            id: id,
+            email: email,
+            password: password,
+            role: 'patient',
+            name: name);
 
   factory Patient.fromMap(Map<String, dynamic> map) {
     return Patient(
