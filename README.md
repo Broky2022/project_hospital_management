@@ -12,9 +12,10 @@
 - Git branch -r: kiểm tra các nhánh cục bộ hiện tại
 
 
-fuc@gmail.com - fuc123
-ci@gmail.com - ci1234
-ky@gmail.com - ky1234
+fuc@gmail.com/fuc123
+fucbs@gmail.com/fuc123
+ci@gmail.com/ci1234
+ky@gmail.com/ky1234
 
 ## mô tả:
 Model:

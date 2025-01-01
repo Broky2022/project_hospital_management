@@ -1,163 +1,64 @@
 import 'package:flutter/material.dart';
+
 import '../database/databaseHelper.dart';
 
-class AppointmentDetailPage extends StatefulWidget {
+class AppointmentDetailPage extends StatelessWidget {
   final int appointmentId;
 
+  // Nhận appointmentId từ constructor
   AppointmentDetailPage({required this.appointmentId});
-
-  @override
-  _AppointmentDetailPageState createState() => _AppointmentDetailPageState();
-}
-
-class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
-  late Future<List<Map<String, dynamic>>> _appointmentDetails;
-
-  @override
-  void initState() {
-    super.initState();
-    // Fetch appointment details
-    _appointmentDetails =
-        DatabaseHelper.instance.getAppointments(widget.appointmentId);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Appointment Details'),
-        centerTitle: true,
-        backgroundColor: Colors.teal, // Custom app bar color
-        elevation: 4,
+        title: Text('Chi tiết cuộc hẹn'),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _appointmentDetails,
+        future: DatabaseHelper.instance
+            .getAppointmentsById(appointmentId), // Gọi hàm getAppointmentsById
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Có lỗi xảy ra: ${snapshot.error}'));
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No appointment details found.'));
+            return Center(child: Text('Không có dữ liệu cho cuộc hẹn này'));
           }
 
-          final appointment = snapshot.data!.first;
+          final appointment = snapshot
+              .data!.first; // Lấy chi tiết cuộc hẹn đầu tiên (vì chỉ có một)
 
-          return SingleChildScrollView(
+          return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Doctor Details Section
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Doctor Details',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.teal,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        _buildDetailRow('Name', appointment['name'] ?? 'N/A'),
-                        _buildDetailRow(
-                            'Specialty', appointment['specialty'] ?? 'N/A'),
-                        _buildDetailRow(
-                            'Years of Experience',
-                            appointment['yearsOfExperience']?.toString() ??
-                                'N/A'),
-                        _buildDetailRow('Status',
-                            appointment['doctor_status']?.toString() ?? 'N/A'),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-
-                // Patient Details Section
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Patient Details',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.teal,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        _buildDetailRow(
-                            'Name', appointment['patient_name'] ?? 'N/A'),
-                        _buildDetailRow('Age',
-                            appointment['patient_age']?.toString() ?? 'N/A'),
-                        _buildDetailRow('Weight',
-                            appointment['patient_weight']?.toString() ?? 'N/A'),
-                        _buildDetailRow(
-                            'Address', appointment['patient_address'] ?? 'N/A'),
-                        _buildDetailRow(
-                            'Disease ID',
-                            appointment['patient_diseaseId']?.toString() ??
-                                'N/A'),
-                        _buildDetailRow('Description',
-                            appointment['patient_description'] ?? 'N/A'),
-                      ],
-                    ),
-                  ),
-                ),
+                Text('Mã cuộc hẹn: ${appointment['appointment_id']}'),
+                SizedBox(height: 8),
+                Text('Thời gian: ${appointment['date_time']}'),
+                Text('Trạng thái: ${appointment['appointment_status']}'),
+                SizedBox(height: 16),
+                Text('Bác sĩ: ${appointment['doctor_name']}'),
+                Text('Chuyên khoa: ${appointment['doctor_specialty']}'),
+                Text(
+                    'Kinh nghiệm: ${appointment['doctor_years_of_experience']} năm'),
+                Text('Mô tả: ${appointment['doctor_description']}'),
+                Text('Trạng thái bác sĩ: ${appointment['doctor_status']}'),
+                SizedBox(height: 16),
+                Text('Bệnh nhân: ${appointment['patient_name']}'),
+                Text('Tuổi: ${appointment['patient_age']}'),
+                Text('Cân nặng: ${appointment['patient_weight']} kg'),
+                Text('Địa chỉ: ${appointment['patient_address']}'),
+                Text('Mô tả: ${appointment['patient_description']}'),
               ],
             ),
           );
         },
-      ),
-    );
-  }
-
-  // Helper method to build a detail row
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$label: ',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

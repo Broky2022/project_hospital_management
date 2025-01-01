@@ -141,15 +141,19 @@ class _DoctorHomeState extends State<DoctorHome> {
 
 //chuyển tab
   Widget _getTabContent(int index) {
+    final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
     switch (index) {
       case 0: // Tab Bệnh nhân
         showData('patients'); //check dữ liệu từ bảng vào console
         return _patientsTab();
       case 1: // Tab Lịch khám
+        print('=> Doctor ID: $doctorId');
+        showData('appointments');
         return _AppointmentsTab();
       case 2: // Tab Hồ sơ
-        final doctorId =
-            Provider.of<AuthProvider>(context, listen: false).userId;
+        showData('doctors');
+        print('=> Doctor ID: $doctorId');
+
         if (doctorId != null) {
           // Trả về DoctorProfilePage với doctorId từ AuthProvider
           return DoctorProfilePage();
@@ -342,13 +346,15 @@ class _AppointmentsTab extends StatelessWidget {
                     'Thời gian: ${appointment['date_time']}\nTrạng thái: ${appointment['status']}'),
                 isThreeLine: true,
                 onTap: () {
+                  print(
+                      '=> ID Appointment đang click: ${appointment['id']}'); //kiểm tra xem có bấm đúng không
                   // Chuyển hướng đến trang AppointmentDetail
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => AppointmentDetailPage(
-                        appointmentId: appointment['id'], // Truyền ID cuộc hẹn
-                      ),
+                          appointmentId: appointment['id'] // Truyền ID cuộc hẹn
+                          ),
                     ),
                   );
                 },
