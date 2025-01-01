@@ -52,14 +52,14 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                     'Doctor: ${appointment['doctor_id']} - ${appointment['name']}'),
                 Text('Specialty: ${appointment['specialty']}'),
                 Text(
-                    'Years of Experience: ${appointment['yearsOfExperience']}'),
+                    'Years of Experience: ${appointment['years_of_experience']}'),
                 Text('Status: ${appointment['doctor_status']}'),
                 SizedBox(height: 20),
                 Text('Patient: ${appointment['patient_name']}'),
                 Text('Age: ${appointment['patient_age']}'),
                 Text('Weight: ${appointment['patient_weight']}'),
                 Text('Address: ${appointment['patient_address']}'),
-                Text('Disease ID: ${appointment['patient_diseaseId']}'),
+                Text('Disease ID: ${appointment['patient_disease_Id']}'),
                 Text(
                     'Patient Description: ${appointment['patient_description']}'),
               ],

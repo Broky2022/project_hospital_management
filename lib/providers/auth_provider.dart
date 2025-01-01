@@ -65,11 +65,10 @@ class AuthProvider with ChangeNotifier {
       // 2. Nếu là doctor thì insert vào bảng doctors
       if (role == 'doctor') {
         final doctorMap = {
-          'id': userId,
+          'id': userId, // Đảm bảo userId được sử dụng đúng
           'name': userData['name'],
           'specialty': userData['specialty'],
-          'years_of_experience': int.tryParse(userData['experience'] ?? '0') ??
-              0, // Giá trị mặc định là 0
+          'years_of_experience': int.tryParse(userData['experience'] ?? '0') ?? 0,
           'description': userData['description'],
           'status': 1, // Giả sử status mặc định là 1 (active)
         };

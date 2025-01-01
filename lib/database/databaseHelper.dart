@@ -18,7 +18,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'medical_app.db');
-    //await deleteDatabase(path);
+    await deleteDatabase(path);
     return await openDatabase(
       path,
       version: 1,
@@ -189,7 +189,7 @@ class DatabaseHelper {
         where: 'doctor_id = ?',
         whereArgs: [doctorId],
       );
-
+      print('Query result: $result'); // Thêm log để kiểm tra kết quả truy vấn
       return result.isNotEmpty ? result.first : null;
     } catch (e) {
       print('Error getting doctor details: $e');
@@ -242,36 +242,33 @@ class DatabaseHelper {
 
   // Hàm lấy chi tiết cuộc hẹn từ bảng Appointment
   Future<List<Map<String, dynamic>>> getAppointments(int appointmentId) async {
-    final db = await database;
+    final db = await instance.database;
 
-    // Câu truy vấn SQL sửa lại
-    String query = '''
+    // Thêm print để debug
+    print('Querying appointment with ID: $appointmentId');
+
+    final result = await db.rawQuery('''
     SELECT 
-        doctors.doctor_id,
-        doctors.name,
-        doctors.specialty,
-        doctors.years_of_experience,
-        doctors.description AS doctor_description,
-        doctors.status AS doctor_status,
-        patients.patient_id,
-        patients.name AS patient_name,
-        patients.age AS patient_age,
-        patients.weight AS patient_weight,
-        patients.address AS patient_address,
-        patients.disease_id AS patient_disease_id,
-        patients.description AS patient_description
-    FROM 
-        appointments
-    JOIN 
-        doctors ON appointments.doctor_id = doctors.doctor_id
-    JOIN 
-        patients ON appointments.patient_id = patients.patient_id
-    WHERE 
-        appointments.id = ?;
-  ''';
+      appointments.*,
+      doctors.name,
+      doctors.specialty,
+      doctors.years_of_experience,
+      doctors.status as doctor_status,
+      patients.name as patient_name,
+      patients.age as patient_age,
+      patients.weight as patient_weight,
+      patients.address as patient_address,
+      patients.disease_id as patient_diseaseId,
+      patients.description as patient_description
+    FROM appointments
+    JOIN doctors ON appointments.doctor_id = doctors.doctor_id
+    JOIN patients ON appointments.patient_id = patients.patient_id
+    WHERE appointments.id = ?
+  ''', [appointmentId]);
 
-    // Thực thi câu truy vấn
-    final result = await db.rawQuery(query, [appointmentId]);
+    // Thêm print để debug
+    print('Query result: $result');
+
     return result;
   }
 }

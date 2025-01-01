@@ -4,6 +4,7 @@ import '../database/databaseHelper.dart';
 import '../database/showData.dart';
 import '../providers/auth_provider.dart';
 import 'appointmentDetail.dart';
+import 'doctor_profile.dart';
 import 'login_form.dart';
 
 class DoctorHome extends StatefulWidget {
@@ -139,28 +140,29 @@ class _DoctorHomeState extends State<DoctorHome> {
   }
 
   // Nội dung của từng tab
+// Nội dung của từng tab
   Widget _getTabContent(int index) {
+
+     // Lấy doctorId từ AuthProvider
+
     switch (index) {
       case 0: // Tab Bệnh nhân
-        //có 5 bảng users, doctors, patients, appointments, diseases
+
         showData('patients'); //check dữ liệu từ bảng vào console
         return _patientsTab();
       case 1: // Tab Lịch khám
         return _AppointmentsTab();
+
       case 2: // Tab Hồ sơ
-        return _profileTab();
+        final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
+        print('Doctor ID: $doctorId'); // In ra để kiểm tra
+        return DoctorProfilePage(doctorId: doctorId!);// Truyền doctorId vào DoctorProfilePage
+
       default:
         return _patientsTab();
     }
   }
 
-  // Tab Hồ sơ
-  Widget _profileTab() {
-    final doctor = Provider.of<AuthProvider>(context).currentUser;
-    return Center(
-      child: Text('Welcome\nDoctor.${doctor?.name}'),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -304,6 +306,7 @@ class _DateTimePickerDialogState extends State<_DateTimePickerDialog> {
     );
   }
 }
+
 
 class _AppointmentsTab extends StatelessWidget {
   @override
