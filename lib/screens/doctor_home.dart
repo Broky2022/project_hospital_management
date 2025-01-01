@@ -139,30 +139,40 @@ class _DoctorHomeState extends State<DoctorHome> {
     // TODO: Implement chuyển tab
   }
 
-  // Nội dung của từng tab
-// Nội dung của từng tab
+//chuyển tab
   Widget _getTabContent(int index) {
-
-     // Lấy doctorId từ AuthProvider
-
+    final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
     switch (index) {
       case 0: // Tab Bệnh nhân
-
         showData('patients'); //check dữ liệu từ bảng vào console
         return _patientsTab();
       case 1: // Tab Lịch khám
+        print('=> Doctor ID: $doctorId');
+        showData('appointments');
         return _AppointmentsTab();
-
       case 2: // Tab Hồ sơ
-        final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
-        print('Doctor ID: $doctorId'); // In ra để kiểm tra
-        return DoctorProfilePage(doctorId: doctorId!);// Truyền doctorId vào DoctorProfilePage
+        showData('doctors');
+        print('=> Doctor ID: $doctorId');
 
+        if (doctorId != null) {
+          // Trả về DoctorProfilePage với doctorId từ AuthProvider
+          return DoctorProfilePage();
+        } else {
+          // Xử lý khi không tìm thấy doctorId (có thể hiển thị thông báo lỗi)
+          return Center(child: Text('Không tìm thấy thông tin bác sĩ.'));
+        }
       default:
         return _patientsTab();
     }
   }
 
+  // Tab Hồ sơ
+  Widget _profileTab() {
+    final doctor = Provider.of<AuthProvider>(context).currentUser;
+    return Center(
+      child: Text('Welcome\nDoctor.${doctor?.name}'),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -307,7 +317,6 @@ class _DateTimePickerDialogState extends State<_DateTimePickerDialog> {
   }
 }
 
-
 class _AppointmentsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -321,7 +330,12 @@ class _AppointmentsTab extends StatelessWidget {
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('Không có lịch hẹn nào'));
+          return Center(
+            child: Text(
+              'Không có lịch hẹn nào',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+          );
         }
 
         return ListView.builder(
@@ -329,29 +343,88 @@ class _AppointmentsTab extends StatelessWidget {
           itemCount: snapshot.data!.length,
           itemBuilder: (context, index) {
             final appointment = snapshot.data![index];
-            return Card(
-              child: ListTile(
-                leading: CircleAvatar(child: Icon(Icons.person)),
-                title: Text(appointment['patient_name'] ?? 'Unknown'),
-                subtitle: Text(
-                    'Thời gian: ${appointment['date_time']}\nTrạng thái: ${appointment['status']}'),
-                isThreeLine: true,
-                onTap: () {
-                  // Chuyển hướng đến trang AppointmentDetail
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AppointmentDetailPage(
-                        appointmentId: appointment['id'], // Truyền ID cuộc hẹn
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    print('=> ID Appointment đang click: ${appointment['id']}');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AppointmentDetailPage(
+                            appointmentId: appointment['id']),
                       ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.blueAccent.withOpacity(0.2),
+                          child: Icon(Icons.person, color: Colors.blueAccent),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                appointment['patient_name'] ?? 'Unknown',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Thời gian: ${appointment['date_time']}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Trạng thái: ${appointment['status']}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: _getStatusColor(appointment['status']),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                      ],
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             );
           },
         );
       },
     );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Đã xác nhận':
+        return Colors.green;
+      case 'Đang chờ':
+        return Colors.orange;
+      case 'Đã hủy':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }

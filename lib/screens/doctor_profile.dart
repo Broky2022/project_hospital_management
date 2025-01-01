@@ -4,9 +4,7 @@ import '../database/databaseHelper.dart';
 import '../providers/auth_provider.dart';
 
 class DoctorProfilePage extends StatefulWidget {
-  final int doctorId;
-
-  const DoctorProfilePage({Key? key, required this.doctorId}) : super(key: key);
+  const DoctorProfilePage({Key? key}) : super(key: key);
 
   @override
   _DoctorProfilePageState createState() => _DoctorProfilePageState();
@@ -18,8 +16,15 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
   @override
   void initState() {
     super.initState();
-    // Khởi tạo Future để lấy thông tin bác sĩ
-    _doctorDetails = DatabaseHelper.instance.getDoctorDetails(widget.doctorId);
+    // Get doctorId from AuthProvider
+    final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
+    if (doctorId != null) {
+      // Initialize Future to get doctor details
+      _doctorDetails = DatabaseHelper.instance.getDoctorDetails(doctorId);
+    } else {
+      // If doctorId not found, handle error (or display a message)
+      _doctorDetails = Future.value(null);
+    }
   }
 
   @override
@@ -28,14 +33,11 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
       appBar: AppBar(
         title: const Text('Hồ sơ Bác sĩ'),
         centerTitle: true,
+        backgroundColor: Colors.teal, // Customize app bar color
       ),
       body: FutureBuilder<Map<String, dynamic>?>(
-        future: _doctorDetails, // Sử dụng _doctorDetails đã khởi tạo
+        future: _doctorDetails,
         builder: (context, snapshot) {
-          print('Snapshot state: ${snapshot.connectionState}');
-          print('Snapshot data: ${snapshot.data}');
-          print('Snapshot error: ${snapshot.error}');
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -51,43 +53,109 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
 
           final doctor = snapshot.data!;
 
-          return Padding(
+          return ListView(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Tên: ${doctor['name']}'),
-                Text('Chuyên khoa: ${doctor['specialty']}'),
-                Text('Số năm kinh nghiệm: ${doctor['years_of_experience']}'),
-                Text(
-                    'Trạng thái: ${doctor['status'] == 1 ? 'Đang hoạt động' : 'Không hoạt động'}'),
-                Text('Mô tả: ${doctor['description'] ?? 'Không có mô tả'}'),
-              ],
-            ),
+            children: [
+              // Profile Picture
+              Center(
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage:
+                      doctor['image'] != null && doctor['image'].isNotEmpty
+                          ? AssetImage(doctor['image'])
+                          : null,
+                  child: doctor['image'] != null && doctor['image'].isNotEmpty
+                      ? null
+                      : Text(
+                          doctor['name'][0],
+                          style: TextStyle(fontSize: 48, color: Colors.white),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Doctor Name
+              Text(
+                doctor['name'],
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+
+              // Specialty
+              Text(
+                doctor['specialty'],
+                style: const TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+
+              // Details Card
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Years of Experience
+                      ListTile(
+                        leading: Icon(Icons.access_time, color: Colors.teal),
+                        title: Text(
+                          'Kinh nghiệm:',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          doctor['years_of_experience'].toString(),
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+
+                      // Status
+                      ListTile(
+                        leading: Icon(Icons.account_circle, color: Colors.teal),
+                        title: Text(
+                          'Trạng thái:',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          doctor['status'] == 1
+                              ? 'Hoạt động'
+                              : 'Không hoạt động',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+
+                      // Description
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Mô tả:',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            child: Text(
+                              doctor['description'] ?? 'Không có mô tả',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           );
         },
-      ),
-    );
-  }
-
-  // Widget để hiển thị thông tin dạng hàng
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$label: ',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
       ),
     );
   }

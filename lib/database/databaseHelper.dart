@@ -8,6 +8,8 @@ class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
   static Database? _database;
 
+  factory DatabaseHelper() => instance;
+
   DatabaseHelper._privateConstructor();
 
   Future<Database> get database async {
@@ -18,7 +20,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'medical_app.db');
-    await deleteDatabase(path);
+    //await deleteDatabase(path);
     return await openDatabase(
       path,
       version: 1,
@@ -169,27 +171,15 @@ class DatabaseHelper {
   ''', [patientId]);
   }
 
-  Future<Appointment?> getAppointmentById(int id) async {
-    final db = await database;
-
-    final List<Map<String, dynamic>> result =
-        await db.query('appointments', where: 'id = ?', whereArgs: [id]);
-
-    if (result.isNotEmpty) {
-      return Appointment.fromMap(result.first);
-    }
-    return null;
-  }
-
   Future<Map<String, dynamic>?> getDoctorDetails(int doctorId) async {
     final db = await database;
     try {
       final List<Map<String, dynamic>> result = await db.query(
         'doctors',
-        where: 'doctor_id = ?',
+        where: 'id = ?',
         whereArgs: [doctorId],
       );
-      print('Query result: $result'); // Thêm log để kiểm tra kết quả truy vấn
+
       return result.isNotEmpty ? result.first : null;
     } catch (e) {
       print('Error getting doctor details: $e');
@@ -224,51 +214,41 @@ class DatabaseHelper {
   ''', [doctorId]);
   }
 
-  Future<Doctor?> getDoctorById(int doctorId) async {
-    final db = await DatabaseHelper.instance.database;
+  Future<List<Map<String, dynamic>>> getAppointmentsById(
+      int appointmentId) async {
+    final db = await database;
 
-    final result = await db.query(
-      'doctors',
-      where: 'doctor_id = ?',
-      whereArgs: [doctorId],
-    );
+    // Câu truy vấn SQL để lấy chi tiết cuộc hẹn từ bảng appointments, doctors và patients
+    String query = '''
+  SELECT 
+      appointments.id AS appointment_id,
+      appointments.date_time,
+      appointments.status AS appointment_status,
+      doctors.doctor_id,
+      doctors.name AS doctor_name,
+      doctors.specialty AS doctor_specialty,
+      doctors.years_of_experience AS doctor_years_of_experience,
+      doctors.description AS doctor_description,
+      doctors.status AS doctor_status,
+      patients.patient_id,
+      patients.name AS patient_name,
+      patients.age AS patient_age,
+      patients.weight AS patient_weight,
+      patients.address AS patient_address,
+      patients.disease_id AS patient_disease_id,
+      patients.description AS patient_description
+  FROM 
+      appointments
+  JOIN 
+      doctors ON appointments.doctor_id = doctors.id
+  JOIN 
+      patients ON appointments.patient_id = patients.patient_id
+  WHERE 
+      appointments.id = ?;
+  ''';
 
-    if (result.isNotEmpty) {
-      // Chuyển đổi dữ liệu từ QueryRow sang Doctor bằng phương thức fromMap
-      return Doctor.fromMap(result.first);
-    }
-    return null;
-  }
-
-  // Hàm lấy chi tiết cuộc hẹn từ bảng Appointment
-  Future<List<Map<String, dynamic>>> getAppointments(int appointmentId) async {
-    final db = await instance.database;
-
-    // Thêm print để debug
-    print('Querying appointment with ID: $appointmentId');
-
-    final result = await db.rawQuery('''
-    SELECT 
-      appointments.*,
-      doctors.name,
-      doctors.specialty,
-      doctors.years_of_experience,
-      doctors.status as doctor_status,
-      patients.name as patient_name,
-      patients.age as patient_age,
-      patients.weight as patient_weight,
-      patients.address as patient_address,
-      patients.disease_id as patient_diseaseId,
-      patients.description as patient_description
-    FROM appointments
-    JOIN doctors ON appointments.doctor_id = doctors.doctor_id
-    JOIN patients ON appointments.patient_id = patients.patient_id
-    WHERE appointments.id = ?
-  ''', [appointmentId]);
-
-    // Thêm print để debug
-    print('Query result: $result');
-
+    // Thực thi câu truy vấn với ID cuộc hẹn
+    final result = await db.rawQuery(query, [appointmentId]);
     return result;
   }
 }

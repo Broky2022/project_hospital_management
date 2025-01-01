@@ -21,9 +21,9 @@ Future<void> showData(String xp) async {
 
     // Kiểm tra dữ liệu và in ra console
     if (data.isEmpty) {
-      print("Không có dữ liệu trong bảng.");
+      print('Không có dữ liệu trong bảng.');
     } else {
-      print("Dữ liệu trong bảng:");
+      print("Dữ liệu trong bảng $xp:");
       for (var row in data) {
         print(row);
       }
