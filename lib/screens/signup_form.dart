@@ -25,7 +25,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
     'address': TextEditingController(),
     'specialty': TextEditingController(),
     'experience': TextEditingController(),
-    'description': TextEditingController(),
+    'description': TextEditingController(text: "Không có mô tả"),
   };
 
   // Các biến trạng thái
@@ -33,7 +33,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
   bool _obscurePassword = true;
   String _selectedRole = 'patient';
 
-  // Controllers cho animation
+  // Animation controller
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -64,7 +64,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập email';
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$');
     if (!emailRegex.hasMatch(value)) {
       return 'Email không hợp lệ';
     }
@@ -93,6 +93,34 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
     return null;
   }
 
+  // Tạo widget cho input field
+  Widget _buildTextField({
+    required String label,
+    required IconData icon,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+    bool obscureText = false,
+    VoidCallback? toggleObscure,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        suffixIcon: toggleObscure != null
+            ? IconButton(
+          icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
+          onPressed: toggleObscure,
+        )
+            : null,
+      ),
+      keyboardType: keyboardType,
+      validator: validator,
+      obscureText: obscureText,
+    );
+  }
+
   // Xử lý đăng ký
   Future<void> _handleSignup() async {
     if (_formKey.currentState?.validate() ?? false) {
@@ -114,46 +142,29 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
           userData['experience'] = controllers['experience']!.text.trim();
         }
 
-        print('Signup data: $userData'); // Debug log
-        final success = await context.read<AuthProvider>().signup(
-          userData,
-          _selectedRole,
-        );
+        final success = await context.read<AuthProvider>().signup(userData, _selectedRole);
+
         if (mounted) {
-          if (success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Đăng ký thành công'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Navigator.pop(context);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Đăng ký thất bại. Vui lòng thử lại'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(success ? 'Đăng ký thành công' : 'Đăng ký thất bại'),
+              backgroundColor: success ? Colors.green : Colors.red,
+            ),
+          );
+
+          if (success) Navigator.pop(context);
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Lỗi: ${e.toString()}'),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text('Lỗi: ${e.toString()}'), backgroundColor: Colors.red),
           );
         }
       } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
+        if (mounted) setState(() => _isLoading = false);
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -204,30 +215,21 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        TextFormField(
-                          controller: controllers['email'],
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: Icon(Icons.email_outlined),
-                          ),
+                        _buildTextField(
+                          label: 'Email',
+                          icon: Icons.email_outlined,
+                          controller: controllers['email']!,
                           keyboardType: TextInputType.emailAddress,
                           validator: _validateEmail,
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: controllers['password'],
-                          decoration: InputDecoration(
-                            labelText: 'Mật khẩu',
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                              ),
-                              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                            ),
-                          ),
-                          obscureText: _obscurePassword,
+                        _buildTextField(
+                          label: 'Mật khẩu',
+                          icon: Icons.lock_outline,
+                          controller: controllers['password']!,
                           validator: _validatePassword,
+                          obscureText: _obscurePassword,
+                          toggleObscure: () => setState(() => _obscurePassword = !_obscurePassword),
                         ),
                       ],
                     ),
@@ -236,109 +238,11 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
 
                 const SizedBox(height: 16),
 
-                // Form thông tin bệnh nhân
+                // Form thông tin theo vai trò
                 if (_selectedRole == 'patient')
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: controllers['name'],
-                            decoration: const InputDecoration(
-                              labelText: 'Họ tên',
-                              prefixIcon: Icon(Icons.person_outline),
-                            ),
-                            validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: controllers['age'],
-                            decoration: const InputDecoration(
-                              labelText: 'Tuổi',
-                              prefixIcon: Icon(Icons.cake_outlined),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) => _validateNumber(value, 'tuổi'),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: controllers['weight'],
-                            decoration: const InputDecoration(
-                              labelText: 'Cân nặng (kg)',
-                              prefixIcon: Icon(Icons.monitor_weight_outlined),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) => _validateNumber(value, 'cân nặng'),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: controllers['address'],
-                            decoration: const InputDecoration(
-                              labelText: 'Địa chỉ',
-                              prefixIcon: Icon(Icons.home_outlined),
-                            ),
-                            validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập địa chỉ' : null,
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                // Form thông tin bác sĩ
+                  _buildPatientForm()
                 else
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: controllers['name'],
-                            decoration: const InputDecoration(
-                              labelText: 'Họ tên',
-                              prefixIcon: Icon(Icons.person_outline),
-                            ),
-                            validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: controllers['specialty'],
-                            decoration: const InputDecoration(
-                              labelText: 'Chuyên khoa',
-                              prefixIcon: Icon(Icons.medical_services_outlined),
-                            ),
-                            validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập chuyên khoa' : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: controllers['experience'],
-                            decoration: const InputDecoration(
-                              labelText: 'Số năm kinh nghiệm',
-                              prefixIcon: Icon(Icons.work_outline),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) => _validateNumber(value, 'số năm kinh nghiệm'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                const SizedBox(height: 16),
-
-                // Form mô tả
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextFormField(
-                      controller: controllers['description'],
-                      decoration: const InputDecoration(
-                        labelText: 'Mô tả',
-                        prefixIcon: Icon(Icons.description_outlined),
-                      ),
-                      maxLines: 3,
-                    ),
-                  ),
-                ),
+                  _buildDoctorForm(),
 
                 const SizedBox(height: 24),
 
@@ -368,6 +272,80 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPatientForm() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildTextField(
+              label: 'Họ tên',
+              icon: Icons.person_outline,
+              controller: controllers['name']!,
+              validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              label: 'Tuổi',
+              icon: Icons.cake_outlined,
+              controller: controllers['age']!,
+              keyboardType: TextInputType.number,
+              validator: (value) => _validateNumber(value, 'tuổi'),
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              label: 'Cân nặng (kg)',
+              icon: Icons.monitor_weight_outlined,
+              controller: controllers['weight']!,
+              keyboardType: TextInputType.number,
+              validator: (value) => _validateNumber(value, 'cân nặng'),
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              label: 'Địa chỉ',
+              icon: Icons.home_outlined,
+              controller: controllers['address']!,
+              validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập địa chỉ' : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDoctorForm() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildTextField(
+              label: 'Họ tên',
+              icon: Icons.person_outline,
+              controller: controllers['name']!,
+              validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              label: 'Chuyên khoa',
+              icon: Icons.medical_services_outlined,
+              controller: controllers['specialty']!,
+              validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập chuyên khoa' : null,
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              label: 'Số năm kinh nghiệm',
+              icon: Icons.work_outline,
+              controller: controllers['experience']!,
+              keyboardType: TextInputType.number,
+              validator: (value) => _validateNumber(value, 'số năm kinh nghiệm'),
+            ),
+          ],
         ),
       ),
     );
