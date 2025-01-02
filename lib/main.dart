@@ -8,6 +8,7 @@ import 'providers/auth_provider.dart';
 import 'screens/login_form.dart';
 import 'screens/doctor_home.dart';
 import 'screens/patient_home.dart';
+import 'screens/HomeMain.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
         ),
-        home: AuthenticationWrapper(),
+        home: MainView(),
       ),
     );
   }

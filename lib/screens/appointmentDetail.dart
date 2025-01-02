@@ -55,10 +55,13 @@ class AppointmentDetailPage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 8),
-                        _buildInfoRow('Mã cuộc hẹn', appointment['appointment_id']),
+                        _buildInfoRow(
+                            'Mã cuộc hẹn', appointment['appointment_id']),
                         _buildInfoRow('Thời gian', appointment['date_time']),
-                        _buildInfoRow('Trạng thái', appointment['appointment_status'],
-                            color: _getStatusColor(appointment['appointment_status'])),
+                        _buildInfoRow(
+                            'Trạng thái', appointment['appointment_status'],
+                            color: _getStatusColor(
+                                appointment['appointment_status'])),
                       ],
                     ),
                   ),
@@ -84,10 +87,13 @@ class AppointmentDetailPage extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         _buildInfoRow('Bác sĩ', appointment['doctor_name']),
-                        _buildInfoRow('Chuyên khoa', appointment['doctor_specialty']),
-                        _buildInfoRow('Kinh nghiệm', '${appointment['doctor_years_of_experience']} năm'),
-                        _buildInfoRow('Mô tả', appointment['doctor_description']),
-                        _buildInfoRow('Trạng thái bác sĩ', appointment['doctor_status']),
+                        _buildInfoRow(
+                            'Chuyên khoa', appointment['doctor_specialty']),
+                        _buildInfoRow('Kinh nghiệm',
+                            '${appointment['doctor_years_of_experience']} năm'),
+                        //không cần 2 cái này đâu
+                        //_buildInfoRow('Mô tả', appointment['doctor_description']),
+                        //_buildInfoRow('Trạng thái bác sĩ', appointment['doctor_status']),
                       ],
                     ),
                   ),
@@ -114,9 +120,12 @@ class AppointmentDetailPage extends StatelessWidget {
                         SizedBox(height: 8),
                         _buildInfoRow('Bệnh nhân', appointment['patient_name']),
                         _buildInfoRow('Tuổi', appointment['patient_age']),
-                        _buildInfoRow('Cân nặng', '${appointment['patient_weight']} kg'),
-                        _buildInfoRow('Địa chỉ', appointment['patient_address']),
-                        _buildInfoRow('Mô tả', appointment['patient_description']),
+                        _buildInfoRow(
+                            'Cân nặng', '${appointment['patient_weight']} kg'),
+                        _buildInfoRow(
+                            'Địa chỉ', appointment['patient_address']),
+                        _buildInfoRow(
+                            'Mô tả', appointment['patient_description']),
                       ],
                     ),
                   ),

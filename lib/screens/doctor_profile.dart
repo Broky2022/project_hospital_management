@@ -36,7 +36,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
         if (data != null) {
           _nameController.text = data['name'] ?? '';
           _specialtyController.text = data['specialty'] ?? '';
-          _experienceController.text = data['years_of_experience']?.toString() ?? '';
+          _experienceController.text =
+              data['years_of_experience']?.toString() ?? '';
           _descriptionController.text = data['description'] ?? '';
         }
       });
@@ -54,7 +55,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     super.dispose();
   }
 
-  Future<void> _saveProfile(int doctorId, Map<String, dynamic> currentData) async {
+  Future<void> _saveProfile(
+      int doctorId, Map<String, dynamic> currentData) async {
     final updatedData = {
       ...currentData,
       'name': _nameController.text,
@@ -79,7 +81,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     }
   }
 
-  Widget _buildEditableField(String label, TextEditingController controller, {int? maxLines}) {
+  Widget _buildEditableField(String label, TextEditingController controller,
+      {int? maxLines}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
@@ -106,13 +109,37 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
         title: const Text('Hồ sơ Bác sĩ'),
         centerTitle: true,
         backgroundColor: Colors.teal,
+        // Ẩn nút back mặc định khi không ở chế độ chỉnh sửa
+        automaticallyImplyLeading:
+            false, // Thêm dòng này để ẩn nút back mặc định
+        // Thêm nút quay lại khi đang trong chế độ chỉnh sửa
+        leading: _isEditing
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  // Reset lại các controller về giá trị ban đầu
+                  _doctorDetails.then((data) {
+                    if (data != null) {
+                      _nameController.text = data['name'] ?? '';
+                      _specialtyController.text = data['specialty'] ?? '';
+                      _experienceController.text =
+                          data['years_of_experience']?.toString() ?? '';
+                      _descriptionController.text = data['description'] ?? '';
+                    }
+                  });
+                  // Tắt chế độ chỉnh sửa
+                  setState(() => _isEditing = false);
+                },
+              )
+            : null,
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.save : Icons.edit),
             onPressed: () {
               if (_isEditing) {
                 if (_formKey.currentState!.validate()) {
-                  final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
+                  final doctorId =
+                      Provider.of<AuthProvider>(context, listen: false).userId;
                   if (doctorId != null) {
                     _doctorDetails.then((currentData) {
                       if (currentData != null) {
@@ -140,7 +167,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Không tìm thấy thông tin bác sĩ.'));
+            return const Center(
+                child: Text('Không tìm thấy thông tin bác sĩ.'));
           }
 
           final doctor = snapshot.data!;
@@ -155,15 +183,20 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: doctor['image'] != null && doctor['image'].isNotEmpty
+                        backgroundImage: doctor['image'] != null &&
+                                doctor['image'].isNotEmpty
                             ? AssetImage(doctor['image'])
                             : null,
-                        child: doctor['image'] != null && doctor['image'].isNotEmpty
+                        child: doctor['image'] != null &&
+                                doctor['image'].isNotEmpty
                             ? null
                             : Text(
-                          _nameController.text.isNotEmpty ? _nameController.text[0] : '',
-                          style: TextStyle(fontSize: 48, color: Colors.white),
-                        ),
+                                _nameController.text.isNotEmpty
+                                    ? _nameController.text[0]
+                                    : '',
+                                style: TextStyle(
+                                    fontSize: 48, color: Colors.white),
+                              ),
                       ),
                       if (_isEditing)
                         Positioned(
@@ -173,7 +206,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                             backgroundColor: Colors.teal,
                             radius: 18,
                             child: IconButton(
-                              icon: Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                              icon: Icon(Icons.camera_alt,
+                                  size: 18, color: Colors.white),
                               onPressed: () {
                                 // TODO: Implement image upload
                               },
@@ -184,16 +218,18 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 if (_isEditing) ...[
                   _buildEditableField('Tên', _nameController),
                   _buildEditableField('Chuyên khoa', _specialtyController),
-                  _buildEditableField('Số năm kinh nghiệm', _experienceController),
-                  _buildEditableField('Mô tả', _descriptionController, maxLines: 3),
+                  _buildEditableField(
+                      'Số năm kinh nghiệm', _experienceController),
+                  _buildEditableField('Mô tả', _descriptionController,
+                      maxLines: 3),
                 ] else ...[
                   Text(
                     doctor['name'],
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -212,10 +248,12 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ListTile(
-                            leading: Icon(Icons.access_time, color: Colors.teal),
+                            leading:
+                                Icon(Icons.access_time, color: Colors.teal),
                             title: Text(
                               'Kinh nghiệm:',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             subtitle: Text(
                               doctor['years_of_experience'].toString(),
@@ -223,13 +261,17 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                             ),
                           ),
                           ListTile(
-                            leading: Icon(Icons.account_circle, color: Colors.teal),
+                            leading:
+                                Icon(Icons.account_circle, color: Colors.teal),
                             title: Text(
                               'Trạng thái:',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             subtitle: Text(
-                              doctor['status'] == 1 ? 'Hoạt động' : 'Không hoạt động',
+                              doctor['status'] == 1
+                                  ? 'Hoạt động'
+                                  : 'Không hoạt động',
                               style: TextStyle(fontSize: 16),
                             ),
                           ),
@@ -238,7 +280,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                             children: [
                               Text(
                                 'Mô tả:',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 8),
                               Container(
