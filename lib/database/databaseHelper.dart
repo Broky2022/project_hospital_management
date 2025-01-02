@@ -187,6 +187,27 @@ class DatabaseHelper {
     }
   }
 
+  Future<bool> updateDoctorProfile(int doctorId, Map<String, dynamic> updatedData) async {
+    final db = await database;
+    try {
+      await db.update(
+        'doctors',
+        {
+          'name': updatedData['name'],
+          'specialty': updatedData['specialty'],
+          'years_of_experience': updatedData['years_of_experience'],
+          'description': updatedData['description'],
+        },
+        where: 'id = ?',
+        whereArgs: [doctorId],
+      );
+      return true;
+    } catch (e) {
+      print('Error updating doctor profile: $e');
+      return false;
+    }
+  }
+
   // Thêm phương thức getDisease
   Future<Map<String, dynamic>?> getDisease(int diseaseId) async {
     final db = await database;
