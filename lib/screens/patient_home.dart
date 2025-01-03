@@ -248,13 +248,6 @@ class _PatientHomeState extends State<PatientHome> {
                       'Lịch hẹn khám bệnh',
                       style: theme.textTheme.titleLarge,
                     ),
-                    TextButton.icon(
-                      icon: const Icon(Icons.add),
-                      label: const Text('Đặt lịch'),
-                      onPressed: () {
-                        // TODO: Implement new appointment
-                      },
-                    ),
                   ],
                 ),
               ),
