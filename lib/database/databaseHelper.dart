@@ -20,7 +20,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'medical_app.db');
-    //await deleteDatabase(path);
+    // await deleteDatabase(path);
     return await openDatabase(
       path,
       version: 1,
@@ -149,6 +149,7 @@ class DatabaseHelper {
     return await db.delete(table, where: whereClause, whereArgs: whereArgs);
   }
 
+
   Future<Map<String, dynamic>?> getPatientProfile(int userId) async {
     Database db = await instance.database;
     List<Map<String, dynamic>> results = await db.query(
@@ -160,15 +161,18 @@ class DatabaseHelper {
     return results.isNotEmpty ? results.first : null;
   }
 
-  Future<List<Map<String, dynamic>>> getPatientAppointments(
-      int patientId) async {
+  Future<List<Map<String, dynamic>>> getPatientAppointments(int userId) async {
     Database db = await instance.database;
     return await db.rawQuery('''
-    SELECT a.*, d.name as doctor_name
+    SELECT 
+      a.*,
+      d.name as doctor_name
     FROM appointments a
-    JOIN doctors d ON a.doctor_id = d.doctor_id
-    WHERE a.patient_id = ?
-  ''', [patientId]);
+    JOIN doctors d ON a.doctor_id = d.id
+    JOIN patients p ON a.patient_id = p.patient_id 
+    WHERE p.id = ?
+    ORDER BY a.date_time DESC
+  ''', [userId]);
   }
 
   Future<Map<String, dynamic>?> getDoctorDetails(int doctorId) async {
