@@ -22,16 +22,8 @@ class DoctorHome extends StatefulWidget {
 
 class _DoctorHomeState extends State<DoctorHome> {
   // Controllers và biến trạng thái
-  final TextEditingController _searchController = TextEditingController();
   int _selectedIndex = 0; // Index cho bottom navigation
-  String _searchQuery = ''; // Query tìm kiếm bệnh nhân
   bool _isLoading = false;
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
 
   // Xử lý đăng xuất
   Future<void> _handleLogout() async {
@@ -70,7 +62,7 @@ class _DoctorHomeState extends State<DoctorHome> {
     switch (index) {
       case 0: // Tab Bệnh nhân
         showData('patients'); //check dữ liệu từ bảng vào console
-        return patientsTab();
+        return PatientsTab();
       case 1: // Tab Lịch khám
         print('=> Doctor ID: $doctorId');
         showData('appointments');
@@ -87,7 +79,7 @@ class _DoctorHomeState extends State<DoctorHome> {
           return Center(child: Text('Không tìm thấy thông tin bác sĩ.'));
         }
       default:
-        return patientsTab();
+        return PatientsTab();
     }
   }
 

@@ -38,7 +38,7 @@ Widget buildInfoRow(IconData icon, String label, String value) {
   );
 }
 
-// Shimmer effect for loading state
+//effect for loading state
 Widget buildShimmerEffect() {
   return ListView.builder(
     padding: const EdgeInsets.all(16.0),
@@ -107,8 +107,6 @@ Widget buildShimmerEffect() {
 Color getStatusColor(String status) {
   switch (status) {
     case 'Đã khám':
-      return Colors.green;
-    case 'đã khám':
       return Colors.green;
     case 'Đang chờ...':
       return Colors.orange;
