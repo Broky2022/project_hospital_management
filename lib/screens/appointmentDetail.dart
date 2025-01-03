@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import '../database/databaseHelper.dart';
 
-class AppointmentDetailPage extends StatelessWidget {
+class AppointmentDetailPage extends StatefulWidget {
   final int appointmentId;
 
   AppointmentDetailPage({required this.appointmentId});
+
+  @override
+  _AppointmentDetailPageState createState() => _AppointmentDetailPageState();
+}
+
+class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
+  bool isButtonDisabled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +22,8 @@ class AppointmentDetailPage extends StatelessWidget {
         iconTheme: IconThemeData(color: Colors.white),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: DatabaseHelper.instance.getAppointmentsById(appointmentId),
+        future:
+            DatabaseHelper.instance.getAppointmentsById(widget.appointmentId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -30,105 +38,53 @@ class AppointmentDetailPage extends StatelessWidget {
           }
 
           final appointment = snapshot.data!.first;
+          isButtonDisabled = appointment['appointment_status'] == 'Đã khám';
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Thông tin cuộc hẹn',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        _buildInfoRow(
-                            'Mã cuộc hẹn', appointment['appointment_id']),
-                        _buildInfoRow('Thời gian', appointment['date_time']),
-                        _buildInfoRow(
-                            'Trạng thái', appointment['appointment_status'],
-                            color: _getStatusColor(
-                                appointment['appointment_status'])),
-                      ],
-                    ),
-                  ),
-                ),
+                _buildAppointmentCard(appointment),
                 SizedBox(height: 16),
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Thông tin bác sĩ',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        _buildInfoRow('Bác sĩ', appointment['doctor_name']),
-                        _buildInfoRow(
-                            'Chuyên khoa', appointment['doctor_specialty']),
-                        _buildInfoRow('Kinh nghiệm',
-                            '${appointment['doctor_years_of_experience']} năm'),
-                        //không cần 2 cái này đâu
-                        //_buildInfoRow('Mô tả', appointment['doctor_description']),
-                        //_buildInfoRow('Trạng thái bác sĩ', appointment['doctor_status']),
-                      ],
-                    ),
-                  ),
-                ),
+                _buildDoctorCard(appointment),
                 SizedBox(height: 16),
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Thông tin bệnh nhân',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
-                          ),
+                _buildPatientCard(appointment),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: isButtonDisabled
+                            ? null
+                            : () => _updateAppointmentStatus(appointment),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: isButtonDisabled
+                              ? Colors.grey
+                              : Colors.blueAccent,
                         ),
-                        SizedBox(height: 8),
-                        _buildInfoRow('Bệnh nhân', appointment['patient_name']),
-                        _buildInfoRow('Tuổi', appointment['patient_age']),
-                        _buildInfoRow(
-                            'Cân nặng', '${appointment['patient_weight']} kg'),
-                        _buildInfoRow(
-                            'Địa chỉ', appointment['patient_address']),
-                        _buildInfoRow(
-                            'Mô tả', appointment['patient_description']),
-                      ],
+                        child: Text(
+                          'Đã khám',
+                          style: TextStyle(
+                              color: isButtonDisabled
+                                  ? Colors.white
+                                  : Colors.white),
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => _confirmDeleteAppointment(),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.redAccent,
+                        ),
+                        child: Text('Xóa'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -136,6 +92,167 @@ class AppointmentDetailPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Widget _buildAppointmentCard(Map<String, dynamic> appointment) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Thông tin cuộc hẹn',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            ),
+            SizedBox(height: 8),
+            _buildInfoRow('Mã cuộc hẹn', appointment['appointment_id']),
+            _buildInfoRow('Thời gian', appointment['date_time']),
+            _buildInfoRow('Trạng thái', appointment['appointment_status'],
+                color: _getStatusColor(appointment['appointment_status'])),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDoctorCard(Map<String, dynamic> appointment) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Thông tin bác sĩ',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            ),
+            SizedBox(height: 8),
+            _buildInfoRow('Tên bác sĩ', appointment['doctor_name']),
+            _buildInfoRow('Chuyên môn', appointment['doctor_specialty']),
+            _buildInfoRow('Kinh nghiệm',
+                '${appointment['doctor_years_of_experience']} năm'),
+            _buildInfoRow('Mô tả', appointment['doctor_description']),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPatientCard(Map<String, dynamic> appointment) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Thông tin bệnh nhân',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            ),
+            SizedBox(height: 8),
+            _buildInfoRow('Tên bệnh nhân', appointment['patient_name']),
+            _buildInfoRow('Tuổi', appointment['patient_age']),
+            _buildInfoRow('Cân nặng', '${appointment['patient_weight']} kg'),
+            _buildInfoRow('Địa chỉ', appointment['patient_address']),
+            _buildInfoRow('Bệnh lý',
+                appointment['patient_disease_id'] ?? 'Chưa xác định'),
+            _buildInfoRow('Mô tả', appointment['patient_description']),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _updateAppointmentStatus(Map<String, dynamic> appointment) async {
+    setState(() {
+      isButtonDisabled = true;
+    });
+
+    bool success = await DatabaseHelper.instance
+        .updateAppointmentStatus(widget.appointmentId, 'đã khám');
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Trạng thái đã cập nhật thành công')),
+      );
+      setState(() {});
+    } else {
+      setState(() {
+        isButtonDisabled = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cập nhật trạng thái thất bại')),
+      );
+    }
+  }
+
+  void _confirmDeleteAppointment() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xác nhận'),
+          content: Text('Bạn có chắc chắn muốn xóa cuộc hẹn này?'),
+          actions: [
+            TextButton(
+              child: Text('Hủy'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Xóa'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteAppointment();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteAppointment() async {
+    bool success =
+        await DatabaseHelper.instance.deleteAppointment(widget.appointmentId);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cuộc hẹn đã được xóa thành công')),
+      );
+      Navigator.of(context)
+          .pop(true); // Trả về `true` để báo hiệu xóa thành công
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Xóa cuộc hẹn thất bại')),
+      );
+    }
   }
 
   Widget _buildInfoRow(String label, dynamic value, {Color? color}) {
@@ -154,7 +271,7 @@ class AppointmentDetailPage extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              value.toString(), // Chuyển đổi giá trị thành String
+              value.toString(),
               style: TextStyle(
                 fontSize: 16,
                 color: color ?? Colors.grey[800],
@@ -168,8 +285,10 @@ class AppointmentDetailPage extends StatelessWidget {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'Đã xác nhận':
+      case 'đã khám':
         return Colors.green;
+      case 'Đã xác nhận':
+        return Colors.blue;
       case 'Đang chờ':
         return Colors.orange;
       case 'Đã hủy':
