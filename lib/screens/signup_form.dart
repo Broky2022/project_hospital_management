@@ -11,7 +11,8 @@ class SignupScreen extends StatefulWidget {
   _SignupScreenState createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderStateMixin {
+class _SignupScreenState extends State<SignupScreen>
+    with SingleTickerProviderStateMixin {
   // Key để quản lý và validate form
   final _formKey = GlobalKey<FormState>();
 
@@ -64,7 +65,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập email';
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$');
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
       return 'Email không hợp lệ';
     }
@@ -110,9 +111,10 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
         prefixIcon: Icon(icon),
         suffixIcon: toggleObscure != null
             ? IconButton(
-          icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
-          onPressed: toggleObscure,
-        )
+                icon:
+                    Icon(obscureText ? Icons.visibility : Icons.visibility_off),
+                onPressed: toggleObscure,
+              )
             : null,
       ),
       keyboardType: keyboardType,
@@ -142,12 +144,14 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
           userData['experience'] = controllers['experience']!.text.trim();
         }
 
-        final success = await context.read<AuthProvider>().signup(userData, _selectedRole);
+        final success =
+            await context.read<AuthProvider>().signup(userData, _selectedRole);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(success ? 'Đăng ký thành công' : 'Đăng ký thất bại'),
+              content:
+                  Text(success ? 'Đăng ký thành công' : 'Đăng ký thất bại'),
               backgroundColor: success ? Colors.green : Colors.red,
             ),
           );
@@ -157,7 +161,9 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: ${e.toString()}'), backgroundColor: Colors.red),
+            SnackBar(
+                content: Text('Lỗi: ${e.toString()}'),
+                backgroundColor: Colors.red),
           );
         }
       } finally {
@@ -202,7 +208,8 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                           child: Text('BÁC SĨ'),
                         ),
                       ],
-                      onChanged: (value) => setState(() => _selectedRole = value!),
+                      onChanged: (value) =>
+                          setState(() => _selectedRole = value!),
                     ),
                   ),
                 ),
@@ -229,7 +236,8 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                           controller: controllers['password']!,
                           validator: _validatePassword,
                           obscureText: _obscurePassword,
-                          toggleObscure: () => setState(() => _obscurePassword = !_obscurePassword),
+                          toggleObscure: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
                       ],
                     ),
@@ -257,17 +265,17 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Text(
-                    'Đăng ký',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                          'Đăng ký',
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
               ],
             ),
@@ -287,7 +295,8 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
               label: 'Họ tên',
               icon: Icons.person_outline,
               controller: controllers['name']!,
-              validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
+              validator: (value) =>
+                  value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
             ),
             const SizedBox(height: 16),
             _buildTextField(
@@ -310,7 +319,8 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
               label: 'Địa chỉ',
               icon: Icons.home_outlined,
               controller: controllers['address']!,
-              validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập địa chỉ' : null,
+              validator: (value) =>
+                  value?.isEmpty ?? true ? 'Vui lòng nhập địa chỉ' : null,
             ),
           ],
         ),
@@ -328,14 +338,16 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
               label: 'Họ tên',
               icon: Icons.person_outline,
               controller: controllers['name']!,
-              validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
+              validator: (value) =>
+                  value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
             ),
             const SizedBox(height: 16),
             _buildTextField(
               label: 'Chuyên khoa',
               icon: Icons.medical_services_outlined,
               controller: controllers['specialty']!,
-              validator: (value) => value?.isEmpty ?? true ? 'Vui lòng nhập chuyên khoa' : null,
+              validator: (value) =>
+                  value?.isEmpty ?? true ? 'Vui lòng nhập chuyên khoa' : null,
             ),
             const SizedBox(height: 16),
             _buildTextField(
@@ -343,7 +355,8 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
               icon: Icons.work_outline,
               controller: controllers['experience']!,
               keyboardType: TextInputType.number,
-              validator: (value) => _validateNumber(value, 'số năm kinh nghiệm'),
+              validator: (value) =>
+                  _validateNumber(value, 'số năm kinh nghiệm'),
             ),
           ],
         ),
