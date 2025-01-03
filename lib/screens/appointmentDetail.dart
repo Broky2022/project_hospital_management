@@ -14,6 +14,27 @@ class AppointmentDetailPage extends StatefulWidget {
 class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
   bool isButtonDisabled = false;
 
+  // Hàm để lấy tên bệnh từ bảng diseases dựa trên disease_id
+  Future<String> _getDiseaseName(int? diseaseId) async {
+    if (diseaseId == null) {
+      return 'Chưa xác định';
+    }
+
+    final db = await DatabaseHelper.instance.database;
+    final result = await db.query(
+      'diseases',
+      columns: ['name'],
+      where: 'id = ?',
+      whereArgs: [diseaseId],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['name'] as String;
+    } else {
+      return 'Chưa xác định';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,8 +201,20 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
             _buildInfoRow('Tuổi', appointment['patient_age']),
             _buildInfoRow('Cân nặng', '${appointment['patient_weight']} kg'),
             _buildInfoRow('Địa chỉ', appointment['patient_address']),
-            _buildInfoRow('Bệnh lý',
-                appointment['patient_disease_id'] ?? 'Chưa xác định'),
+            // Sử dụng FutureBuilder để hiển thị tên bệnh
+            FutureBuilder<String>(
+              future: _getDiseaseName(appointment['patient_disease_id']),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return _buildInfoRow('Bệnh lý', 'Đang tải...');
+                } else if (snapshot.hasError) {
+                  return _buildInfoRow('Bệnh lý', 'Lỗi: ${snapshot.error}');
+                } else {
+                  return _buildInfoRow(
+                      'Bệnh lý', snapshot.data ?? 'Chưa xác định');
+                }
+              },
+            ),
             _buildInfoRow('Mô tả', appointment['patient_description']),
           ],
         ),
