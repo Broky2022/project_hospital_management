@@ -187,7 +187,8 @@ class DatabaseHelper {
     }
   }
 
-  Future<bool> updateDoctorProfile(int doctorId, Map<String, dynamic> updatedData) async {
+  Future<bool> updateDoctorProfile(
+      int doctorId, Map<String, dynamic> updatedData) async {
     final db = await database;
     try {
       await db.update(
@@ -271,5 +272,34 @@ class DatabaseHelper {
     // Thực thi câu truy vấn với ID cuộc hẹn
     final result = await db.rawQuery(query, [appointmentId]);
     return result;
+  }
+
+  Future<bool> deleteAppointment(int appointmentId) async {
+    final db = await database;
+    int result = await db.delete(
+      'appointments',
+      where: 'id = ?',
+      whereArgs: [appointmentId],
+    );
+    return result > 0; // Trả về true nếu xóa thành công
+  }
+
+  Future<bool> updateAppointmentStatus(
+      int appointmentId, String newStatus) async {
+    final db = await database;
+
+    try {
+      int result = await db.update(
+        'appointments',
+        {'status': newStatus}, // Cập nhật cột `status` với giá trị mới
+        where: 'id = ?',
+        whereArgs: [appointmentId],
+      );
+
+      return result > 0; // Trả về true nếu cập nhật thành công
+    } catch (e) {
+      print('Error updating appointment status: $e');
+      return false; // Trả về false nếu có lỗi xảy ra
+    }
   }
 }
