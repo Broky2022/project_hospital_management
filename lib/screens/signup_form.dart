@@ -64,7 +64,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập email';
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$');
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
       return 'Email không hợp lệ';
     }
