@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import 'appointmentDetail.dart';
 import 'doctor_profile.dart';
 import 'login_form.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DoctorHome extends StatefulWidget {
   const DoctorHome({Key? key}) : super(key: key);
@@ -71,12 +72,13 @@ class _DoctorHomeState extends State<DoctorHome> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('Patient Details',
-                  style: Theme.of(context).textTheme.headlineSmall),
+                  style: Theme.of(context).textTheme.headlineMedium),
               SizedBox(height: 8),
-              Text('Name: ${patient['name']}'),
-              Text('Age: ${patient['age']}'),
-              Text('Weight: ${patient['weight']} kg'),
-              Text('Address: ${patient['address']}'),
+              _buildInfoRow(Icons.person, 'Name', patient['name']),
+              _buildInfoRow(Icons.cake, 'Age', '${patient['age']}'),
+              _buildInfoRow(
+                  Icons.monitor_weight, 'Weight', '${patient['weight']} kg'),
+              _buildInfoRow(Icons.location_on, 'Address', patient['address']),
               // Nút đặt lịch khám
               const SizedBox(height: 16),
               SizedBox(
@@ -111,6 +113,43 @@ class _DoctorHomeState extends State<DoctorHome> {
     );
   }
 
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: Colors.blueAccent),
+          SizedBox(width: 8),
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$label: ',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  TextSpan(
+                    text: value,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Xử lý đặt lịch khám
   Future<void> _scheduleAppointment(BuildContext context, int patientId) async {
     final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
@@ -124,7 +163,7 @@ class _DoctorHomeState extends State<DoctorHome> {
         'doctor_id': doctorId,
         'patient_id': patientId,
         'date_time': result.toIso8601String(),
-        'status': 'Đã đặt',
+        'status': 'Đang chờ...',
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -213,35 +252,202 @@ class _DoctorHomeState extends State<DoctorHome> {
     );
   }
 
-  // Tab Bệnh nhân
   Widget _patientsTab() {
     return FutureBuilder<List<Map<String, dynamic>>>(
-      // Danh sách bệnh nhân
       future: DatabaseHelper.instance.queryAllRows('patients'),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return _buildShimmerEffect(); // Show shimmer effect while loading
         }
 
         if (snapshot.hasError) {
-          return Center(child: Text('Có lỗi xảy ra'));
+          return Center(
+            child: Text(
+              'Có lỗi xảy ra',
+              style: GoogleFonts.poppins(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          );
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('Không có bệnh nhân'));
+          return Center(
+            child: Text(
+              'Không có bệnh nhân',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          );
         }
 
         return ListView.builder(
+          padding: const EdgeInsets.all(16.0),
           itemCount: snapshot.data!.length,
           itemBuilder: (context, index) {
             final patient = snapshot.data![index];
-            return ListTile(
-              leading: const Icon(Icons.person),
-              title: Text(patient['name']),
-              subtitle: Text('Tuổi: ${patient['age']}'),
-              onTap: () => _showPatientDetails(context, patient),
+            return AnimatedOpacity(
+              opacity: 1.0,
+              duration: const Duration(milliseconds: 500),
+              child: Card(
+                elevation: 6,
+                margin: const EdgeInsets.only(bottom: 16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () => _showPatientDetails(context, patient),
+                  splashColor: Colors.blueAccent.withOpacity(0.1),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.blueAccent.withOpacity(0.1),
+                          Colors.white,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.blueAccent.withOpacity(0.2),
+                            child: const Icon(Icons.person,
+                                color: Colors.blueAccent),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  patient['name'] ?? 'Không rõ tên',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueAccent,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Icon(Icons.cake,
+                                        size: 16, color: Colors.grey[600]),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Tuổi: ${patient['age'] ?? 'Không rõ'}',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Icon(Icons.location_on,
+                                        size: 16, color: Colors.grey[600]),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Địa chỉ: ${patient['address'] ?? 'Không rõ'}',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios,
+                              color: Colors.grey),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             );
           },
+        );
+      },
+    );
+  }
+
+// Shimmer effect for loading state
+  Widget _buildShimmerEffect() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: 6, // Number of shimmer placeholders
+      itemBuilder: (context, index) {
+        return Card(
+          elevation: 6,
+          margin: const EdgeInsets.only(bottom: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.grey[200]!,
+                  Colors.grey[100]!,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.grey[300],
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 120,
+                          height: 18,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 80,
+                          height: 14,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 150,
+                          height: 14,
+                          color: Colors.grey[300],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
@@ -317,13 +523,30 @@ class _DateTimePickerDialogState extends State<_DateTimePickerDialog> {
   }
 }
 
-class _AppointmentsTab extends StatelessWidget {
+class _AppointmentsTab extends StatefulWidget {
+  @override
+  _AppointmentsTabState createState() => _AppointmentsTabState();
+}
+
+class _AppointmentsTabState extends State<_AppointmentsTab> {
+  late Future<List<Map<String, dynamic>>> _appointmentsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppointments();
+  }
+
+  void _loadAppointments() {
+    final doctorId = Provider.of<AuthProvider>(context, listen: false).userId;
+    _appointmentsFuture =
+        DatabaseHelper.instance.getDoctorAppointments(doctorId!);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final doctorId = Provider.of<AuthProvider>(context).userId;
-
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: DatabaseHelper.instance.getDoctorAppointments(doctorId!),
+      future: _appointmentsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -352,15 +575,20 @@ class _AppointmentsTab extends StatelessWidget {
                 ),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                  onTap: () {
-                    print('=> ID Appointment đang click: ${appointment['id']}');
-                    Navigator.push(
+                  onTap: () async {
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => AppointmentDetailPage(
-                            appointmentId: appointment['id']),
+                          appointmentId: appointment['id'],
+                        ),
                       ),
                     );
+
+                    // Tải lại danh sách khi quay về từ AppointmentDetailPage
+                    setState(() {
+                      _loadAppointments();
+                    });
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -417,12 +645,12 @@ class _AppointmentsTab extends StatelessWidget {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'Đã xác nhận':
+      case 'Đã khám':
         return Colors.green;
-      case 'Đang chờ':
+      case 'đã khám':
+        return Colors.green;
+      case 'Đang chờ...':
         return Colors.orange;
-      case 'Đã hủy':
-        return Colors.red;
       default:
         return Colors.grey;
     }
