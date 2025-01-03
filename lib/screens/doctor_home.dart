@@ -4,6 +4,7 @@ import '../database/databaseHelper.dart';
 import '../database/showData.dart';
 import '../providers/auth_provider.dart';
 import '../utils/config.dart';
+import 'addDiseaseScreen.dart';
 import 'appointmentDetail.dart';
 import 'appointmentsTab.dart';
 import 'dateTimePickerDialog.dart';
@@ -90,6 +91,18 @@ class _DoctorHomeState extends State<DoctorHome> {
         title: const Text('Quản lý bệnh nhân'),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              showData('diseases');
+              // Điều hướng đến màn hình thêm bệnh
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddDiseaseScreen()),
+              );
+            },
+            tooltip: 'Thêm Bệnh',
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _handleLogout,
