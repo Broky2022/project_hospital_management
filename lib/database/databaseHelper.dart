@@ -302,4 +302,16 @@ class DatabaseHelper {
       return false; // Trả về false nếu có lỗi xảy ra
     }
   }
+
+  // Hàm cập nhật mô tả trong cơ sở dữ liệu
+  Future<void> updatePatientDescription(
+      int patientId, String description) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.update(
+      'patients',
+      {'description': description}, // Cập nhật mô tả
+      where: 'patient_id = ?',
+      whereArgs: [patientId],
+    );
+  }
 }

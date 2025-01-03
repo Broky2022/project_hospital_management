@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../database/databaseHelper.dart';
+import '../utils/config.dart';
 
 class AppointmentDetailPage extends StatefulWidget {
   final int appointmentId;
@@ -117,7 +118,7 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
             _buildInfoRow('Mã cuộc hẹn', appointment['appointment_id']),
             _buildInfoRow('Thời gian', appointment['date_time']),
             _buildInfoRow('Trạng thái', appointment['appointment_status'],
-                color: _getStatusColor(appointment['appointment_status'])),
+                color: getStatusColor(appointment['appointment_status'])),
           ],
         ),
       ),
@@ -194,7 +195,7 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
     });
 
     bool success = await DatabaseHelper.instance
-        .updateAppointmentStatus(widget.appointmentId, 'đã khám');
+        .updateAppointmentStatus(widget.appointmentId, 'Đã khám');
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -281,20 +282,5 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
         ],
       ),
     );
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'đã khám':
-        return Colors.green;
-      case 'Đã xác nhận':
-        return Colors.blue;
-      case 'Đang chờ':
-        return Colors.orange;
-      case 'Đã hủy':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
   }
 }
