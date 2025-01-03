@@ -211,53 +211,174 @@ class _PatientsTabState extends State<PatientsTab> {
       text: patient['description'] ?? '',
     );
 
+    // Biến để lưu danh sách bệnh
+    int? selectedDiseaseId =
+        patient['disease_id']; // Giữ disease_id của bệnh nhân hiện tại
+    String? selectedDiseaseName; // Biến để lưu tên bệnh
+
+    // Hiển thị modal bottom sheet
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom, // Tránh keyboard
-            left: 16,
-            right: 16,
-            top: 16,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Chi tiết bệnh nhân',
-                  style: Theme.of(context).textTheme.headlineMedium),
-              SizedBox(height: 8),
-              buildInfoRow(Icons.person, 'Tên', patient['name']),
-              buildInfoRow(Icons.cake, 'Tuổi', '${patient['age']}'),
-              buildInfoRow(
-                  Icons.monitor_weight, 'Cân nặng', '${patient['weight']} kg'),
-              buildInfoRow(Icons.location_on, 'Địa chỉ', patient['address']),
-              SizedBox(height: 16),
-              Text('Mô tả:',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-              TextField(
-                controller: descriptionController,
-                maxLines: 4,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Nhập mô tả bệnh nhân...',
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context)
+                      .viewInsets
+                      .bottom, // Tránh keyboard
+                  left: 16,
+                  right: 16,
+                  top: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Chi tiết bệnh nhân',
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    SizedBox(height: 8),
+                    buildInfoRow(Icons.person, 'Tên', patient['name']),
+                    buildInfoRow(Icons.cake, 'Tuổi', '${patient['age']}'),
+                    buildInfoRow(Icons.monitor_weight, 'Cân nặng',
+                        '${patient['weight']} kg'),
+                    buildInfoRow(
+                        Icons.location_on, 'Địa chỉ', patient['address']),
+
+                    // Dropdown để chọn bệnh
+                    SizedBox(height: 16),
+                    Text('Bệnh:',
+                        style:
+                            GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+
+                    // Tải danh sách bệnh
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: DatabaseHelper.instance.queryAllRows('diseases'),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+                        if (snapshot.hasError) {
+                          return Text('Có lỗi xảy ra');
+                        }
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return Text('Không có bệnh');
+                        }
+
+                        // Tạo danh sách các lựa chọn bệnh
+                        List<Map<String, dynamic>> diseases = snapshot.data!;
+
+                        // Tìm tên bệnh dựa trên selectedDiseaseId
+                        if (selectedDiseaseId != null) {
+                          selectedDiseaseName = diseases.firstWhere(
+                            (disease) => disease['id'] == selectedDiseaseId,
+                            orElse: () => {'name': 'Không rõ bệnh'},
+                          )['name'];
+                        }
+
+                        return DropdownButton<int>(
+                          value: selectedDiseaseId,
+                          hint: Text(selectedDiseaseName ??
+                              'Chọn bệnh'), // Hiển thị tên bệnh nếu có
+                          onChanged: (newValue) {
+                            setModalState(() {
+                              selectedDiseaseId = newValue;
+                              // Cập nhật tên bệnh sau khi chọn
+                              selectedDiseaseName = diseases.firstWhere(
+                                (disease) => disease['id'] == newValue,
+                                orElse: () => {'name': 'Không rõ bệnh'},
+                              )['name'];
+                            });
+                          },
+                          items: diseases.map<DropdownMenuItem<int>>((disease) {
+                            return DropdownMenuItem<int>(
+                              value: disease['id'],
+                              child: Text(disease['name'] ?? 'Không rõ tên'),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+
+                    // Mô tả
+                    SizedBox(height: 16),
+                    Text('Mô tả:',
+                        style:
+                            GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                    TextField(
+                      controller: descriptionController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Nhập mô tả bệnh nhân...',
+                      ),
+                    ),
+
+                    // Nút đặt lịch khám
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () =>
+                            scheduleAppointment(context, patient['patient_id']),
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(
+                              const EdgeInsets.all(12)),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.calendar_today),
+                            SizedBox(width: 8),
+                            Text('Đặt lịch khám'),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Nút lưu thay đổi mô tả
+                    SizedBox(height: 16),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          // Cập nhật mô tả và disease_id trong bảng patients
+                          updatePatient(patient['patient_id'],
+                              descriptionController.text, selectedDiseaseId);
+                          Navigator.pop(context);
+                          await _loadPatients(); // Sử dụng await để đợi hàm _loadPatients hoàn thành
+                        },
+                        child: Text('Lưu thay đổi'),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  updatePatientDescription(
-                      patient['patient_id'], descriptionController.text);
-                  Navigator.pop(context);
-                },
-                child: Text('Lưu thay đổi'),
-              ),
-            ],
-          ),
-        ),
-      ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+// Hàm cập nhật mô tả và disease_id trong cơ sở dữ liệu
+  void updatePatient(int patientId, String description, int? diseaseId) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.update(
+      'patients',
+      {
+        'description': description,
+        'disease_id': diseaseId, // Cập nhật disease_id
+      },
+      where: 'patient_id = ?',
+      whereArgs: [patientId],
     );
   }
 
